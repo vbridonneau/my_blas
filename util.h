@@ -1,5 +1,6 @@
 #ifndef DEF_UTIL_H
 #define DEF_UTIL_H
+#include <stdio.h>
 
 void affiche(int m, int n, double *a, int lda, FILE* flux);
 

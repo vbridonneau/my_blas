@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-O3 -std=c99
+CFLAGS=-std=c99
 LDFLAGS=-lm
-SRC=util.c ddot.c dgemm.c
+SRC=util.c ddot.c dgemm.c daxpy.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
 
@@ -11,7 +11,7 @@ test:libmyblas.a driver.o
 	${CC} ${CFLAGS} -o test ${OBJ} driver.o -L. -lmyblas ${LDFLAGS}
 	./test
 
-ddotc-perf:libmyblas.a ddotc-perf.o
+%-perf:libmyblas.a %-perf.o
 	${CC} ${CFLAGS} -o $@ $^ -L. -lmyblas ${LDFLAGS}
 	sh ./$@.sh
 
