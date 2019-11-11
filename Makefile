@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99
 LDFLAGS=-lm
-SRC=util.c ddot.c dgemm.c daxpy.c
+SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
 

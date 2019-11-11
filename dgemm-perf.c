@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
-#include "misc.h"
+#include "util.h"
 #include "dgemm.h"
 
 #ifndef SIZE
@@ -14,13 +14,6 @@ static double* tmp_alloc_matrix(int m, int n, double val) {
         res[i] = val;
     }
     return res;
-}
-
-static void rnd_matrix_buff(double *v, int bottom, int up, int size, int seed) {
-    srand(seed);
-    for (int i = 0; i < size; ++i) {
-        v[i] = rand() % (up - bottom + 1) + bottom;
-    }
 }
 
 static void fill_succesion(double *v, int m, int n) {

@@ -12,4 +12,8 @@ void init_vector(double *vec, int m, double val);
 
 double* alloc_vector(int m);
 
+void rnd_matrix_buff(double *v, int bottom, int up, int size, int seed);
+
+int eq_double(double a, double b, double eps);
+
 #endif//DEF_UTIL_H

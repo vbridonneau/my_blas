@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 void affiche(int m, int n, double *a, int lda, FILE* flux) {
   for (int l = 0; l < m; l++) {
@@ -31,4 +32,15 @@ void init_vector(double *vec, int m, double val) {
 
 double* alloc_vector(int m) {
   return (double*)malloc(m * sizeof(double));
+}
+
+void rnd_matrix_buff(double *v, int bottom, int up, int size, int seed) {
+    srand(seed);
+    for (int i = 0; i < size; ++i) {
+        v[i] = rand() % (up - bottom + 1) + bottom;
+    }
+}
+
+int eq_double(double a, double b, double eps) {
+  return fabs(a - b) < eps;
 }
