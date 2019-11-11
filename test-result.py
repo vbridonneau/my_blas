@@ -53,13 +53,14 @@ def main():
             res = func(a, np.transpose(A), X, b, Y)
         else:
             res = func(a, A, X, b, Y)
+        print("lengths : X : {}, Y : {}, res : {}".format(len(X), len(Y), len(res)))
     atol = 1e-9
     correct = np.allclose(res, C, rtol=0.0, atol=atol)
     print ("result of \"{}\" is correct : {}".format(fname, correct))
     for i in range(len(res)):
         if abs(res[i] - C[i]) > atol:
-            print("First different value at {} : diff {}"\
-                  .format(i, abs(res[i] - C[i])))
+            print("First different value at {} : ({}, {})"\
+                  .format(i, res[i], C[i]))
             return
 
 main()

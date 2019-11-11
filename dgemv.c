@@ -34,7 +34,7 @@ void my_dgemv(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE Trans,
   assert(Order == COLUMN_MAJOR);
   assert(Trans == 'T' || Trans == 't' || Trans == 'N' || Trans == 'n');
   int transA = (Trans == 't' || Trans == 'T');
-  int lenY = (transA) ? M : N;
+  int lenY = (transA) ? N : M;
   /* Scale Y before all */
   if (beta != 1.) {
     if (beta == 0. && incY == 1) {

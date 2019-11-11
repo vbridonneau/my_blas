@@ -4,7 +4,7 @@
 #include <string.h>
 
 const int ROWS = 128;
-const int COLS = 256;
+const int COLS = 32;
 
 void test_result() {
   double *X, *M, *Y, alpha, beta;
@@ -15,6 +15,7 @@ void test_result() {
   beta  = (rand() % 10) + 1;
 
   printf("X %d 1\n", ROWS); affiche(ROWS, 1, X, 1, stdout);
+  /* The 't' only means that the operation involves A**t but we write A (not A** t) */
   printf("At %d %d\n", ROWS, COLS); affiche(ROWS, COLS, M, ROWS, stdout);
   printf("Y %d 1\n", COLS); affiche(COLS, 1, Y, 1, stdout);
   printf("a %lf\n", alpha);
