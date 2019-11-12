@@ -13,6 +13,8 @@ b = None
 transA = False
 transB = False
 
+def donothing(A):return A
+
 def main():
     var  = "ABCXYab"
     with open(sys.argv[1], "r") as f:
@@ -48,19 +50,19 @@ def main():
     fname = sys.argv[2]
     func = getattr(linalg.blas, fname)
     if (fname == "dgemv"):
-        print("transA ", transA)
-        if transA:
-            res = func(a, np.transpose(A), X, b, Y)
-        else:
-            res = func(a, A, X, b, Y)
-        print("lengths : X : {}, Y : {}, res : {}".format(len(X), len(Y), len(res)))
+        opA = np.transpose if transA else donothing
+        res = func(a, opA(A), X, b, Y)
+    elif (fname == "dgemm"):
+        opA = np.transpose if transA else donothing
+        opB = np.transpose if transB else donothing
+        res = func(a, opA(A), opB(B), b, C)
     atol = 1e-9
     correct = np.allclose(res, C, rtol=0.0, atol=atol)
     print ("result of \"{}\" is correct : {}".format(fname, correct))
-    for i in range(len(res)):
-        if abs(res[i] - C[i]) > atol:
-            print("First different value at {} : ({}, {})"\
-                  .format(i, res[i], C[i]))
-            return
+    #for i in range(len(res)):
+        #if abs(res[i] - C[i]) > atol:
+            #print("First different value at {} : ({}, {})"\
+                  #.format(i, res[i], C[i]))
+            #return
 
 main()

@@ -4,10 +4,6 @@
 #include "util.h"
 #include "dgemm.h"
 
-#ifndef SIZE
-#define SIZE 10
-#endif//SIZE
-
 static double* tmp_alloc_matrix(int m, int n, double val) {
     double *res = malloc(m * n * sizeof(double));
     for (int i = 0; i < m*n; i++) {
@@ -24,19 +20,27 @@ static void fill_succesion(double *v, int m, int n) {
     }
 }
 
+#ifndef SIZE
+#define SIZE 10
+#endif//SIZE
+
+const int M = 256;
+const int K = 128;
+const int N = 64;
+
 void test_matrix_product() {
-    for (int size = SIZE; size <= SIZE; ++size) {
-        double *A, *B, *C;
-        A = tmp_alloc_matrix(size, size, 0.0); rnd_matrix_buff(A, 1, 10, size * size, 1);
-        B = tmp_alloc_matrix(size, size, 0.0); rnd_matrix_buff(B, 1, 10, size * size, 1);
-        C = tmp_alloc_matrix(size, size, 0.0);
-        fprintf(stdout, "A %d %d\n", size, size); affiche(size, size, A, size, stdout);
-        fprintf(stdout, "B %d %d\n", size, size); affiche(size, size, B, size, stdout);
-        fprintf(stdout, "C %d %d\n", size, size); affiche(size, size, C, size, stdout);
-        my_dgemm(COLUMN_MAJOR, 't', 'n', size, size, size, 1.0, A, size, B, size, 0.0, C, size);
-        fprintf(stdout, "C %d %d\n", size, size); affiche(size, size, C, size, stdout);
-        free(A);free(B);free(C);
-    }
+    double *A, *B, *C;
+    A = tmp_alloc_matrix(K, M, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1);
+    B = tmp_alloc_matrix(K, N, 0.0); rnd_matrix_buff(B, 1, 10, K * N, 1);
+    C = tmp_alloc_matrix(M, N, 0.0);
+    fprintf(stdout, "At %d %d\n", K, M); affiche(K, M, A, K, stdout);
+    fprintf(stdout, "B %d %d\n", K, N); affiche(K, N, B, K, stdout);
+    fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
+    fprintf(stdout, "a %lf\n", 1.);
+    fprintf(stdout, "b %lf\n", 0.);
+    my_dgemm_scalaire(COLUMN_MAJOR, 't', 'n', M, N, K, 1.0, A, K, B, K, 0.0, C, M);
+    fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
+    free(A);free(B);free(C);
 }
 
 #ifndef timersub
@@ -68,13 +72,13 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
-    int start, end, step, nsample;
-    start   = atoi(argv[1]);
-    end     = atoi(argv[2]);
-    step    = atoi(argv[3]);
-    nsample = atoi(argv[4]);
-    //test_matrix_product();
-    test_dgemm_perf(start, end, step, nsample);
+    // if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
+    // int start, end, step, nsample;
+    // start   = atoi(argv[1]);
+    // end     = atoi(argv[2]);
+    // step    = atoi(argv[3]);
+    // nsample = atoi(argv[4]);
+    test_matrix_product();
+    // test_dgemm_perf(start, end, step, nsample);
     return EXIT_SUCCESS;
 }
