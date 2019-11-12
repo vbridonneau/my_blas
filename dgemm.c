@@ -48,8 +48,8 @@ void my_dgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA, c
     int mbloc = (int)ceil((double)M/(double)BLOCK_SIZE), lastm = M % BLOCK_SIZE;
     int nbloc = (int)ceil((double)N/(double)BLOCK_SIZE), lastn = N % BLOCK_SIZE;
     for(int k = 0; k < kbloc; ++k) {
-        for (int i = 0; i < kbloc; ++i) {
-            for (int j = 0; j < kbloc; ++j) {
+        for (int i = 0; i < mbloc; ++i) {
+            for (int j = 0; j < nbloc; ++j) {
                 int k_blk_size = (k < kbloc - 1 || !lastk) ? BLOCK_SIZE : lastk;
                 int i_blk_size = (i < mbloc - 1 || !lastm) ? BLOCK_SIZE : lastm;
                 int j_blk_size = (j < nbloc - 1 || !lastn) ? BLOCK_SIZE : lastn;

@@ -1,0 +1,4 @@
+#pragma once
+
+enum CBLAS_ORDER {COLUMN_MAJOR, ROW_MAJOR};
+enum CBLAS_TRANSPOSE {DEFAULT = 'n', TRANSPOSE = 't'};

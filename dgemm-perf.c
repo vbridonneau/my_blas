@@ -24,7 +24,7 @@ static void fill_succesion(double *v, int m, int n) {
 #define SIZE 10
 #endif//SIZE
 
-const int M = 256;
+const int M = 255;
 const int K = 128;
 const int N = 64;
 
@@ -38,7 +38,7 @@ void test_matrix_product() {
     fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
     fprintf(stdout, "a %lf\n", 1.);
     fprintf(stdout, "b %lf\n", 0.);
-    my_dgemm_scalaire(COLUMN_MAJOR, 't', 'n', M, N, K, 1.0, A, K, B, K, 0.0, C, M);
+    my_dgemm(COLUMN_MAJOR, 't', 'n', M, N, K, 1.0, A, K, B, K, 0.0, C, M);
     fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
     free(A);free(B);free(C);
 }
