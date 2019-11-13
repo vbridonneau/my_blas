@@ -56,6 +56,8 @@ def main():
         opA = np.transpose if transA else donothing
         opB = np.transpose if transB else donothing
         res = func(a, opA(A), opB(B), b, C)
+    elif (fname == "dger"):
+        res = func(a, X, Y, a=A)
     atol = 1e-9
     correct = np.allclose(res, C, rtol=0.0, atol=atol)
     print ("result of \"{}\" is correct : {}".format(fname, correct))
