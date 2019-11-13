@@ -25,20 +25,20 @@ static void fill_succesion(double *v, int m, int n) {
 #endif//SIZE
 
 const int M = 255;
-const int K = 128;
+const int K = 130;
 const int N = 64;
 
 void test_matrix_product() {
     double *A, *B, *C;
-    A = tmp_alloc_matrix(K, M, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1);
+    A = tmp_alloc_matrix(M, K, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1);
     B = tmp_alloc_matrix(K, N, 0.0); rnd_matrix_buff(B, 1, 10, K * N, 1);
     C = tmp_alloc_matrix(M, N, 0.0);
-    fprintf(stdout, "At %d %d\n", K, M); affiche(K, M, A, K, stdout);
+    fprintf(stdout, "A %d %d\n", M, K); affiche(M, K, A, M, stdout);
     fprintf(stdout, "B %d %d\n", K, N); affiche(K, N, B, K, stdout);
     fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
     fprintf(stdout, "a %lf\n", 1.);
     fprintf(stdout, "b %lf\n", 0.);
-    my_dgemm(COLUMN_MAJOR, 't', 'n', M, N, K, 1.0, A, K, B, K, 0.0, C, M);
+    my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M);
     fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
     free(A);free(B);free(C);
 }

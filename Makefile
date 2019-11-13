@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c99
+CFLAGS=-std=c99 -O0 -g
 LDFLAGS=-lm
 SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
