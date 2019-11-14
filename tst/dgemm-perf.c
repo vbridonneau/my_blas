@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include "util.h"
 #include "dgemm.h"
+#include "algonum.h"
 
 static double* tmp_alloc_matrix(int m, int n, double val) {
     double *res = malloc(m * n * sizeof(double));
@@ -29,18 +30,21 @@ const int K = 130;
 const int N = 64;
 
 void test_matrix_product() {
-    double *A, *B, *C;
-    A = tmp_alloc_matrix(M, K, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1);
-    B = tmp_alloc_matrix(K, N, 0.0); rnd_matrix_buff(B, 1, 10, K * N, 1);
-    C = tmp_alloc_matrix(M, N, 0.0);
-    fprintf(stdout, "A %d %d\n", M, K); affiche(M, K, A, M, stdout);
-    fprintf(stdout, "B %d %d\n", K, N); affiche(K, N, B, K, stdout);
-    fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
-    fprintf(stdout, "a %lf\n", 1.);
-    fprintf(stdout, "b %lf\n", 0.);
-    my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M);
-    fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout);
-    free(A);free(B);free(C);
+  /* double *A, *B, *C; */
+  /* A = tmp_alloc_matrix(M, K, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1); */
+  /* B = tmp_alloc_matrix(K, N, 0.0); rnd_matrix_buff(B, 1, 10, K * N, 1); */
+  /* C = tmp_alloc_matrix(M, N, 0.0); */
+  /* fprintf(stdout, "A %d %d\n", M, K); affiche(M, K, A, M, stdout); */
+  /* fprintf(stdout, "B %d %d\n", K, N); affiche(K, N, B, K, stdout); */
+  /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
+  /* fprintf(stdout, "a %lf\n", 1.); */
+  /* fprintf(stdout, "b %lf\n", 0.); */
+  /* my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M); */
+  /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
+  /* free(A);free(B);free(C); */
+  char *str[] = {"OK", "NOK"};
+  printf("dgemm_scalaire : %s\n", str[!!testall_dgemm( my_dgemm_scalaire )] );
+  printf("dgemm bloc : %s\n", str[!!testall_dgemm( my_dgemm )] );
 }
 
 #ifndef timersub
