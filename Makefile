@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c99
+CFLAGS=-std=c99 -I./include
 LDFLAGS=-lm
 SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
@@ -12,10 +12,10 @@ test:libmyblas.a driver.o
 	./test
 
 %-perf:libmyblas.a %-perf.o
-	${CC} ${CFLAGS} -o $@ $^ -L. -lmyblas ${LDFLAGS}
+	${CC} ${CFLAGS} -o test/$@ $^ -L. -lmyblas ${LDFLAGS}
 	sh ./$@.sh
 
-%.o:%.c
+%.o:src/%.c
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
 
 libmyblas.a:$(OBJ)
