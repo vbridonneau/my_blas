@@ -1,25 +1,28 @@
 CC=gcc
-CFLAGS=-std=c99 -I./include
+CFLAGS=-std=c99 -I./include/
 LDFLAGS=-lm
 SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
 
-all:libmyblas.a
+all:lib/libmyblas.a
 
-test:libmyblas.a driver.o
-	${CC} ${CFLAGS} -o test ${OBJ} driver.o -L. -lmyblas ${LDFLAGS}
+test:lib/libmyblas.a driver.o
+	${CC} ${CFLAGS} -o test ${OBJ} driver.o -L./lib/ -lmyblas ${LDFLAGS}
 	./test
 
-%-perf:libmyblas.a %-perf.o
-	${CC} ${CFLAGS} -o test/$@ $^ -L. -lmyblas ${LDFLAGS}
-	sh ./$@.sh
+%-perf:lib/libmyblas.a %-perf.o
+	${CC} ${CFLAGS} -o tst/$@ $^ -L./lib/ -lmyblas -L ~cisd-faverge/algonum/lib/ -lalgonum ${LDFLAGS}
+	./tst/$@
+
+%-perf.o:tst/%-perf.c
+	${CC} ${CFLAGS} -c $< ${LDFLAGS}
 
 %.o:src/%.c
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
 
-libmyblas.a:$(OBJ)
-	ar crs libmyblas.a $^
+lib/libmyblas.a:$(OBJ)
+	ar crs lib/libmyblas.a $^
 
 clean:
-	rm *.o libmyblas.a
+	rm *.o lib/libmyblas.a

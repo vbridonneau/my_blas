@@ -43,14 +43,14 @@ void test_matrix_product() {
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
   char *str[] = {"OK", "NOK"};
-  printf("dgemm_scalaire : %s\n", str[!!testall_dgemm( my_dgemm_scalaire )] );
-  printf("dgemm bloc : %s\n", str[!!testall_dgemm( my_dgemm )] );
+  int r1 = !!testall_dgemm( my_dgemm_scalaire );
+  //  int r2 = !!testall_dgemm( my_dgemm );
 }
 
 #ifndef timersub
 #define timersub(a, b, result) do { (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; (result)->tv_usec = (a)->tv_usec - (b)->tv_usec; if ((result)->tv_usec < 0) { --(result)->tv_sec; (result)->tv_usec += 1000000; } } while (0)
 #endif//timersub
-
+/*
 void test_dgemm_perf(int start, int end, int step, int nsample) {
     int size;
     struct timeval startt, endt, deltat;
@@ -73,7 +73,7 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
         }
         free(A); free(B); free(C);
     }
-}
+    }*/
 
 int main(int argc, char **argv) {
     // if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
