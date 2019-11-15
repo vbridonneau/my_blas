@@ -1,8 +1,7 @@
 #include "dgetrf.h"
-#include "definition.h"
+#include "algonum.h"
 
-int my_dgetf2(const enum CBLAS_ORDER Order, int m, int n, double* a, int lda ) {
-	assert(ipiv == NULL);
+int my_dgetf2(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
 	int i,j,k;
 	for(k=0;k<n;k++) {
 		for(i=k+1; i<n; i++) {
@@ -14,8 +13,7 @@ int my_dgetf2(const enum CBLAS_ORDER Order, int m, int n, double* a, int lda ) {
 	}
 }
 
-int my_dgetrf(const enum CBLAS_ORDER Order, int m, int n, double* a, int lda ) {
-	assert(ipiv == NULL);
+int my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
 	int i,j,k;
 	for(k=0;k<n;k++) {
 		for(i=k+1; i<n; i++) {

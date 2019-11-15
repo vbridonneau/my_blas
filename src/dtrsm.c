@@ -1,5 +1,6 @@
 #include "dtrsm.h"
 #include "definition.h"
+#include <stdbool.h>
 
 int my_dtrsm(char side, char uplo, char transa, char *	diag, int m, int n, double alpha, double * a, int lda, double * b, int ldb) {
 	assert(side == 'l');
