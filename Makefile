@@ -1,6 +1,7 @@
 CC=gcc
-CFLAGS=-std=c99 -I./include/
-LDFLAGS=-lm
+LIB_ALGO_NUM_PATH=/home/cisd-faverge/algonum/lib
+CFLAGS=-std=c99 -I./include/ -Wl,-rpath,$(LIB_ALGO_NUM_PATH)
+LDFLAGS=-lm -L$(LIB_ALGO_NUM_PATH) -lalgonum
 SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
@@ -12,7 +13,7 @@ test:lib/libmyblas.a driver.o
 	./test
 
 %-perf:lib/libmyblas.a %-perf.o
-	${CC} ${CFLAGS} -o tst/$@ $^ -L./lib/ -lmyblas -L ~cisd-faverge/algonum/lib/ -lalgonum ${LDFLAGS}
+	${CC} ${CFLAGS} -o tst/$@ $^ -L./lib/ -lmyblas ${LDFLAGS}
 	./tst/$@
 
 %-perf.o:tst/%-perf.c
