@@ -1,5 +1,6 @@
 #include "dtrsm.h"
-#include "definition.h"
+#include "algonum.h"
+#include <assert.h>
 #include <stdbool.h>
 
 int my_dtrsm(char side, char uplo, char transa, char *	diag, int m, int n, double alpha, double * a, int lda, double * b, int ldb) {
@@ -7,6 +8,9 @@ int my_dtrsm(char side, char uplo, char transa, char *	diag, int m, int n, doubl
 	assert(uplo == 'u');
 	int i, j, k;
 	double lambda;
+
+	// FIXME: a ne devrait pas etre modifié
+	// TODO: prendre en compte les parametres side et diag
 
 	if ((uplo == 'l') || (uplo == 'L')) {
 		for(j=0; j<n; j++) {
