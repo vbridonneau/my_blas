@@ -43,14 +43,14 @@ void test_matrix_product() {
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
   char *str[] = {"OK", "NOK"};
-  int r1 = !!testall_dgemm( my_dgemm_scalaire );
+  int r1 = !!testall_dgemm( my_dgemm );
   //  int r2 = !!testall_dgemm( my_dgemm );
 }
 
 #ifndef timersub
 #define timersub(a, b, result) do { (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; (result)->tv_usec = (a)->tv_usec - (b)->tv_usec; if ((result)->tv_usec < 0) { --(result)->tv_sec; (result)->tv_usec += 1000000; } } while (0)
 #endif//timersub
-/*
+
 void test_dgemm_perf(int start, int end, int step, int nsample) {
     int size;
     struct timeval startt, endt, deltat;
@@ -64,24 +64,24 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
             rnd_matrix_buff(A, 1, 10, size * size, size);
             rnd_matrix_buff(B, 1, 10, size * size, size);
             gettimeofday(&startt, NULL);
-            my_dgemm(COLUMN_MAJOR, 't', 'n', size, size, size, 1., A, size, B, size, 0.0, C, size);
+            my_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
             gettimeofday(&endt, NULL);
             timersub(&endt, &startt, &deltat);
-	    double _size = (double)size;
-	    double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
-            printf("%d,%lf\n", size, 2*_size*_size*_size/time);
+	        double _size = (double)size;
+	        double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
+            printf("%d,%lf\n", size, flops_dgemm(_size, _size, _size)/time);
         }
         free(A); free(B); free(C);
     }
-    }*/
+}
 
 int main(int argc, char **argv) {
-    // if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
-    // int start, end, step, nsample;
-    // start   = atoi(argv[1]);
-    // end     = atoi(argv[2]);
-    // step    = atoi(argv[3]);
-    // nsample = atoi(argv[4]);
+    /* if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;} */
+    /* int start, end, step, nsample; */
+    /* start   = atoi(argv[1]); */
+    /* end     = atoi(argv[2]); */
+    /* step    = atoi(argv[3]); */
+    /* nsample = atoi(argv[4]); */
     test_matrix_product();
     // test_dgemm_perf(start, end, step, nsample);
     return EXIT_SUCCESS;
