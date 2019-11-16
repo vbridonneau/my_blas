@@ -64,11 +64,11 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
             rnd_matrix_buff(A, 1, 10, size * size, size);
             rnd_matrix_buff(B, 1, 10, size * size, size);
             gettimeofday(&startt, NULL);
-            my_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+            my_dgemm_scalaire(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
             gettimeofday(&endt, NULL);
             timersub(&endt, &startt, &deltat);
-	        double _size = (double)size;
-	        double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
+	    double _size = (double)size;
+	    double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
             printf("%d,%lf\n", size, flops_dgemm(_size, _size, _size)/time);
         }
         free(A); free(B); free(C);
@@ -76,13 +76,13 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
 }
 
 int main(int argc, char **argv) {
-    /* if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;} */
-    /* int start, end, step, nsample; */
-    /* start   = atoi(argv[1]); */
-    /* end     = atoi(argv[2]); */
-    /* step    = atoi(argv[3]); */
-    /* nsample = atoi(argv[4]); */
-    test_matrix_product();
-    // test_dgemm_perf(start, end, step, nsample);
+    if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
+    int start, end, step, nsample;
+    start   = atoi(argv[1]);
+    end     = atoi(argv[2]);
+    step    = atoi(argv[3]);
+    nsample = atoi(argv[4]);
+    // test_matrix_product();
+    test_dgemm_perf(start, end, step, nsample);
     return EXIT_SUCCESS;
 }

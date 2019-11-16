@@ -1,1 +1,1 @@
-./tst/dgemm-perf 100 10000 25 50
+./tst/dgemm-perf 50 1000 25 50

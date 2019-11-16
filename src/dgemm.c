@@ -149,7 +149,7 @@ static inline void my_dgemm_tAtB_ijk(const int M, const int N, const int K, cons
 void my_dgemm_scalaire(const CBLAS_LAYOUT Order, const enum CBLAS_TRANSPOSE TransA, const enum CBLAS_TRANSPOSE TransB, const int M, const int N, const int K, const double alpha, const double *A, const int lda, const double *B, const int ldb, const double beta, double *C, const int ldc) {
     if (Order != CblasColMajor) return;
     if ((TransA == CblasTrans) && (TransB == CblasNoTrans)){
-      my_dgemm_tAB_ijk(M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+      my_dgemm_tAB_jik(M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
     } else if (TransA == CblasNoTrans && TransB == CblasNoTrans) {
       my_dgemm_AB_ijk(M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
     } else if (TransA == CblasNoTrans && TransB == CblasTrans) {
