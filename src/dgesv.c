@@ -3,8 +3,9 @@
 #include <assert.h>
 #include <stdbool.h>
 
-int dgesv_(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, int *info) {
-	  // lu fact
-	  // trsm 1
-	  // trsm 2
+void dgesv(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, int *info) {
+	// FIXME: PAS FINIIII
+	  my_dgetrf(0, m, n, a, lda );
+	  my_dtrsm('l', 'u', 'N', NULL, m, n, 1.0, a, lda, b, ldb);
+	  my_dtrsm('l', 'l', 'N', NULL, m, n, 1.0, a, lda, b, ldb);
 }

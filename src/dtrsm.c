@@ -9,6 +9,9 @@ int my_dtrsm(char side, char uplo, char transa, char *	diag, int m, int n, doubl
 	int i, j, k;
 	double lambda;
 
+	// FIXME: a ne devrait pas etre modifié
+	// TODO: prendre en compte les parametres side et diag
+
 	if ((uplo == 'l') || (uplo == 'L')) {
 		for(j=0; j<n; j++) {
 			for(i=j+1; i<n; i++) {
