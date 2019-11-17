@@ -5,8 +5,6 @@
 
 void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO Uplo, CBLAS_TRANSPOSE transA, const CBLAS_DIAG Diag, const int M, const int N, const double alpha, const double *A, const int lda, double * B, const int ldb) {
   assert(layout == CblasColMajor);
-  /* assert(side == 'l'); */
-  /* assert(uplo == 'u'); */
   double lambda;
 
   if (M == 0 || N == 0) return;
@@ -20,9 +18,6 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
     }
     return;
   }
-
-  // FIXME: a ne devrait pas etre modifié
-  // TODO: prendre en compte les parametres side et diag
 
   /* Left side : X * op( A ) = alpha * B */
   if (Side == CblasLeft) {
@@ -60,6 +55,21 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
     }
   }
   else {
-    assert(false);
+    if (transA == CblasTrans) {
+        if (Uplo == CblasUpper) {
+
+        }
+        else {
+
+        }
+    }
+    else {
+        if (Uplo == CblasUpper) {
+
+        }
+        else {
+
+        }
+    }
   }
 }
