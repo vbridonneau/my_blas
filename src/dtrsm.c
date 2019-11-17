@@ -53,22 +53,99 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
 	}
       }
     }
+    else {
+
+    }
   }
   else {
     if (transA == CblasTrans) {
         if (Uplo == CblasUpper) {
-
+            for (j=0;j<n;j++) {
+                if (alpha != 1.0) {
+                    // scale
+                }
+                for (k = 0; k<j; k++) {
+                    if (A[k+j*lda] != 0.0) {
+                        for(i=0;i<m;i++) {
+                            B[i+j*ldb] -= A[k+j*lda];
+                        }
+                    }
+                }
+                if  (Diag == CblasNonUnit) {
+                    lambda = 1.0/A[i*j*lda];
+                    for (i=0;i<m;i++) {
+                        B[i+j*ldb] = temp*B[i+j*ldb];
+                    }
+                }
+            }
         }
         else {
-
+            for (j=n-1; j>=0; j--) {
+                if (alpha != 1.0) {
+                    // scale
+                }
+                for (k = j+1; k<n; k++) {
+                    if (A[k+j*lda] != 0.0) {
+                        for(i=0;i<m;i++) {
+                            B[i+j*ldb] -= A[k+j*lda];
+                        }
+                    }
+                }
+                if  (Diag == CblasNonUnit) {
+                    lambda = 1.0/A[i*j*lda];
+                    for (i=0;i<m;i++) {
+                        B[i+j*ldb] = lambda*B[i+j*ldb];
+                    }
+                }
+            }
         }
     }
     else {
         if (Uplo == CblasUpper) {
-
+            for (k=N-1; k>=0; k--) {
+                if (Diag == CblasNonUnit) {
+                    lambda = 1.0/A[k+k*lda];
+                    for(i=0; i<M; i++) {
+                        B[i+k*ldb] = lambda*B[i+k*ldb];
+                    }
+                }
+                for (j=0; j< k-1; j++) {
+                    if(A[j+k*lda] != 0.0) {
+                        lambda = A[j+k*lda];
+                        for(i=0;i<M;i++) {
+                            B[i+j*lda] -= lambda*B[i+k*lda];
+                        }
+                    }
+                }
+                if (alpha != 1.0){
+                    for (i=0; i<M; i++) {
+                        B[i+k*lda] = alpha * B[i+k*ldb];
+                    }
+                }
+            }
         }
         else {
-
+            for (k=0; k<N; k++) {
+                if (Diag == CblasNonUnit) {
+                    lambda = 1.0/A[k+k*lda];
+                    for(i=0; i<M; i++) {
+                        B[i+k*ldb] = lambda*B[i+k*ldb];
+                    }
+                }
+                for (j=k+1; j< N; j++) {
+                    if(A[j+k*lda] != 0.0) {
+                        lambda = A[j+k*lda];
+                        for(i=0;i<M;i++) {
+                            B[i+j*lda] -= lambda*B[i+k*lda];
+                        }
+                    }
+                }
+                if (alpha != 1.0){
+                    for (i=0; i<M; i++) {
+                        B[i+k*lda] = alpha * B[i+k*ldb];
+                    }
+                }
+            }
         }
     }
   }
