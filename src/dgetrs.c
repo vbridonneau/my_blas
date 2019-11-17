@@ -2,19 +2,8 @@
 #include <stdbool.h>
 #include "algonum.h"
 
-void my_dgetrs(
-    char trans,
-    int n,
-    int nrhs,
-    double * a,
-    int lda,
-    double * ipiv,
-    double * b,
-    int ldb,
-    int info,
-) {
-    info = 0;
-    bool notran = (trans == 'N') || (trans == 'n');
+int  my_dgetrs(const CBLAS_TRANSPOSE trans, const int n, const int nrhs, const double * a, const int lda, const double * ipiv, double * b, const int ldb) {
+  int notran = (trans == CblasNoTrans);
 
     if( !notran && ( trans != 'T' ) && ( trans != 't' ) && ( trans != 'C' ) && ( trans != 'c' ) {
         info = -1;

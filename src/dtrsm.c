@@ -3,40 +3,63 @@
 #include <assert.h>
 #include <stdbool.h>
 
-int my_dtrsm(char side, char uplo, char transa, char *	diag, int m, int n, double alpha, double * a, int lda, double * b, int ldb) {
-	assert(side == 'l');
-	assert(uplo == 'u');
-	int i, j, k;
-	double lambda;
+void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO Uplo, CBLAS_TRANSPOSE transA, const CBLAS_DIAG Diag, const int M, const int N, const double alpha, const double *A, const int lda, double * B, const int ldb) {
+  assert(layout == CblasColMajor);
+  /* assert(side == 'l'); */
+  /* assert(uplo == 'u'); */
+  double lambda;
 
-	// FIXME: a ne devrait pas etre modifié
-	// TODO: prendre en compte les parametres side et diag
+  if (M == 0 || N == 0) return;
 
-	if ((uplo == 'l') || (uplo == 'L')) {
-		for(j=0; j<n; j++) {
-			for(i=j+1; i<n; i++) {
-				lambda = a[i+j*lda]/a[j+j*lda];
-				for(k=j; k<n; k++) {
-					a[i+k*lda] -= lambda * a[j+k*lda];
-				}
-				b[i] -= lambda*b[j];
-			}
-			b[j] /= a[j+j*lda];
-		}
+  /* scale 0. */
+  if (alpha == 0.) {
+    for(int j = 0; j < N; ++j) {
+      for (int i = 0; i < M; ++i) {
+	B[i + j * ldb] = 0.;
+      }
+    }
+    return;
+  }
+
+  // FIXME: a ne devrait pas etre modifié
+  // TODO: prendre en compte les parametres side et diag
+
+  /* Left side : X * op( A ) = alpha * B */
+  if (Side == CblasLeft) {
+    /* B = alpha * inv(A ** t) * B */
+    if (transA == CblasTrans) {
+      /* A is a lower triangular */
+      if (Uplo == CblasLower) {
+	for(int j = 0; j < N; ++j) {
+	  for(int i = M - 1; i >= 0; --i) {
+	    lambda = alpha * B[i + j*ldb];
+	    for(int k = i + 1; k < M; ++k) {
+	      lambda -= B[k + j*ldb] * A[k + i*lda];
+	    }
+	    /* The diagonal is A[i + i*lda] (Otherwise : 1.) */
+	    /* Relevent when solving A = L*U as we use A to store
+	     both L and U, so Diag(L) is full of 1. . */
+	    if (Diag == CblasNonUnit) lambda /= A[i*(1 + lda)];
+	    B[i + j*ldb] = lambda;
+	  }
 	}
-	else if ((uplo == 'u') || (uplo == 'U')) {
-		for(j=n-1; 0<j+1; j--) {
-			for(i=j-1; 0<=i; i--) {
-				lambda = a[i+j*lda]/a[j+j*lda];
-				for(k=j; 0<=k; k--) {
-					a[i+k*lda] -= lambda * a[j+k*lda];
-				}
-				b[i] -= lambda*b[j];
-			}
-			b[j] /= a[j+j*lda];
-		}
+      }
+      /* A is triangular upper */
+      else if (Uplo == CblasUpper) {
+	for(int j= 0; j < N; ++j) {
+	  for(int i = 0; i < M; ++i) {
+	    lambda = alpha * B[i + j*ldb];
+	    for(int k = 0; k < i; ++k) {
+	      lambda -=  A[k + i*lda] * B[k + j*ldb];
+	    }
+	    if (Diag == CblasNonUnit) lambda /= A[i*(1 + lda)];
+	    B[i + j*ldb] = lambda;
+	  }
 	}
-	else {
-		assert(false);
-	}
+      }
+    }
+  }
+  else {
+    assert(false);
+  }
 }
