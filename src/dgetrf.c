@@ -3,6 +3,8 @@
 #include "algonum.h"
 #include "dscal.h"
 #include "dger.h"
+#include "dtrsm.h"
+#include "dgemm.h"
 
 static inline int min(const int a, const int b) {
     return (a < b) ? a : b;
@@ -35,17 +37,17 @@ void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
     return;
     nb = 10; // ilaenv( 1, 'DGETRF', ' ', m, n, -1, -1 )
     if( nb<=1 || nb>=min( m, n ) ) {
-        my_dgetrf2( m, n, a, lda, ipiv, info );
+        my_dgetf2( Order, m, n, a, lda );
     }
     else {
         for(j=0; j<min( m, n ); j+=nb) {
             jb = min( min( m, n )-j+1, nb );
-            my_dgetrf2( m-j+1, jb, &a[ j+ j*lda], lda, &ipiv[j]);
+            my_dgetf2( Order, m-j+1, jb, a + j+ j*lda, lda);
 
             if( j+jb <= n ) {
-                my_dtrsm( CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb+1, one, &a[ j+ j*lda], lda, &a[ j +(j+jb)*lda ], lda );
+                my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb+1, 1., a + j+ j*lda, lda, a + j +(j+jb)*lda, lda );
                 if( j+jb<=m ) {
-                    my_dgemm( CblasNoTrans, CblasNoTrans, m-j-jb+1,n-j-jb+1, jb, -one, &a[j+jb+ j*lda] ), lda,&a[ j+ (j+jb)*lda], lda, one, &a[ j+jb+ (j+jb)*lda],lda );
+                    my_dgemm( Order, CblasNoTrans, CblasNoTrans, m-j-jb+1,n-j-jb+1, jb, -1., a + j+jb + j*lda, lda, a + j + (j+jb)*lda, lda, 1., a + j + jb + (j+jb)*lda, lda );
                 }
             }
         }
