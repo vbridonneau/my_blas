@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include "algonum.h"
 
-void dgetrs(
+void my_dgetrs(
     char trans,
     int n,
     int nrhs,
@@ -39,14 +39,14 @@ void dgetrs(
     if( n==0 || nrhs==0 )
     return;
     if( notran ) {
-        dlaswp( nrhs, b, ldb, 1, n, ipiv, 1 );
-        dtrsm( 'L', 'L', 'N', 'U', n, nrhs, one, a, lda, b, ldb );
-        dtrsm( 'L', 'U', 'N', 'N', n, nrhs, one, a, lda, b, ldb );
+        my_dlaswp( nrhs, b, ldb, 1, n, ipiv, 1 );
+        my_dtrsm( 'L', 'L', 'N', 'U', n, nrhs, one, a, lda, b, ldb );
+        my_dtrsm( 'L', 'U', 'N', 'N', n, nrhs, one, a, lda, b, ldb );
     }
     else {
-        dtrsm( 'L', 'U', 'T', 'N', n, nrhs, one, a, lda, b, ldb );
-        dtrsm( 'L', 'L', 'T', 'U', n, nrhs, one, a, lda, b, ldb );
-        dlaswp( nrhs, b, ldb, 1, n, ipiv, -1 );
+        my_dtrsm( 'L', 'U', 'T', 'N', n, nrhs, one, a, lda, b, ldb );
+        my_dtrsm( 'L', 'L', 'T', 'U', n, nrhs, one, a, lda, b, ldb );
+        my_dlaswp( nrhs, b, ldb, 1, n, ipiv, -1 );
     }
     return;
 }

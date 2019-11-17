@@ -1,7 +1,7 @@
 #ifndef DEF_DGETRS_H
 #define DEF_DGETRS_H
 
-void dgetrs(
+void my_dgetrs(
     char trans,
     int n,
     int nrhs,

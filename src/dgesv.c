@@ -2,18 +2,19 @@
 #include "algonum.h"
 #include <assert.h>
 #include <stdbool.h>
+#include "util.h"
 
-void dgesv(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, int *info) {
+void my_dgesv(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, int *info) {
 	if ( n<0 ) {
 		info = -1;
 	}
-	else if( nrhs.LT.0 ){
+	else if( nrhs < 0 ){
 		info = -2;
 	}
-	else if( lda.LT.max( 1, n ) ) {
+	else if( lda < MAX( 1, n ) ) {
 		info = -4;
 	}
-	else if( ldb.LT.max( 1, n ) ) {
+	else if( ldb < MAX( 1, n ) ) {
 		info = -7;
 	}
 	if( info != 0 ) {
@@ -22,8 +23,8 @@ void dgesv(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, 
 		return;
 	}
 
-	dgetrf( n, n, a, lda, ipiv, info );
+	my_dgetrf( n, n, a, lda, ipiv, info );
 	if( info == 0 ) {
-		dgetrs( 'N', n, nrhs, a, lda, ipiv, b, ldb, info );
+		my_dgetrs( 'N', n, nrhs, a, lda, ipiv, b, ldb, info );
 	}
 }

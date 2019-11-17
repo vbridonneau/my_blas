@@ -2,6 +2,9 @@
 #define DEF_UTIL_H
 #include <stdio.h>
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 void affiche(int m, int n, double *a, int lda, FILE* flux);
 
 void init_matrix(double *mat, int m, int n, int lda, double val);
