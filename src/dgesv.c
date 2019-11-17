@@ -4,8 +4,26 @@
 #include <stdbool.h>
 
 void dgesv(int n, int nrhs, double *a, int lda, int *ipiv, double *b, int *ldb, int *info) {
-	// FIXME: PAS FINIIII
-	  my_dgetrf(0, m, n, a, lda );
-	  my_dtrsm('l', 'u', 'N', NULL, m, n, 1.0, a, lda, b, ldb);
-	  my_dtrsm('l', 'l', 'N', NULL, m, n, 1.0, a, lda, b, ldb);
+	if ( n<0 ) {
+		info = -1;
+	}
+	else if( nrhs.LT.0 ){
+		info = -2;
+	}
+	else if( lda.LT.max( 1, n ) ) {
+		info = -4;
+	}
+	else if( ldb.LT.max( 1, n ) ) {
+		info = -7;
+	}
+	if( info != 0 ) {
+		// xerbla( 'DGESV ', -info ); error handling
+		assert(0);
+		return;
+	}
+
+	dgetrf( n, n, a, lda, ipiv, info );
+	if( info == 0 ) {
+		dgetrs( 'N', n, nrhs, a, lda, ipiv, b, ldb, info );
+	}
 }
