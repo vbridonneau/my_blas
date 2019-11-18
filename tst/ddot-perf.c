@@ -22,7 +22,7 @@ static double* tmp_vec_alloc(int m, double val) {
 void test_ddot_perf(int start, int end, int step, int nsample) {
     int size;
     struct timeval startt, endt, deltat;
-    printf("size,res,time\n");
+    printf("size,perf\n");
     for (size = start; size < end; size = (size*(100 + step))/100) {
         double *X, *Y;
         for (int sample = 0; sample < nsample; ++sample) {
@@ -35,7 +35,7 @@ void test_ddot_perf(int start, int end, int step, int nsample) {
             //printf("%d,%lf,%ld.%06ld\n", size, res, deltat.tv_sec, deltat.tv_usec);
 	    double _size = (double)size;
 	    double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
-	    if (time > 0.) printf("%d,%lf,%lf\n", size, res, _size/time);
+	    if (time > 0.) printf("%d,%lf\n", size, 2*_size/time);
             free(X); free(Y);
         }
     }

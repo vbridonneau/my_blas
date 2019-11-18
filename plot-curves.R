@@ -4,14 +4,15 @@ mean <- aggregate(.~size, times[, 1-4], "mean")
 min <- aggregate(.~size, times[, 1-4], "min")
 max <- aggregate(.~size, times[, 1-4], "max")
 stda <- aggregate(.~size, times[, 1-4], "sd")*sqrt(5/6)
-names(stda)[names(stda) == "time"] = "std"
+names(stda)[names(stda) == "perf"] = "std"
 stat <- cbind(mean, stda[, 2])
 names(stat)[names(stat) == "stda[, 2]"] = "std"
 print(stat)
-ggplot(stat, aes(x = size, y = time)) + 
+ggplot(stat, aes(x = size, y = perf) + ) + 
 	     geom_line() + 
 	     geom_ribbon(aes(ymin = time - std,
                        	     ymax = time + std), alpha = 0.2)
+			     + labs(x = "size : n", y = "performance (Flops/s)")
 
 #cover_min <- apply(mean, 2, "
 #plot(mean, sub="Problem scaling", xlab="Vector size", ylab="GFlop/s", type="l", col="red")

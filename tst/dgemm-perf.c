@@ -54,7 +54,7 @@ void test_matrix_product() {
 void test_dgemm_perf(int start, int end, int step, int nsample) {
     int size;
     struct timeval startt, endt, deltat;
-    printf("size,time\n");
+    printf("size,perf\n");
     for (size = start; size < end; size = (size*(100 + step))/100) {
         double *A, *B, *C;
         A = tmp_alloc_matrix(size, size, 0.0);
