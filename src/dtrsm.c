@@ -4,6 +4,32 @@
 #include "dtrsm.h"
 #include "algonum.h"
 
+/*
+layout  CHARACTER*1
+              = CblasColMajor   storage order is column
+              = CblasRowMajor   storage order is row
+SIDE    CHARACTER*1
+              = CblasLeft     op( A )*X = alpha*B.
+              = CblasRight    X*op( A ) = alpha*B.
+UPLO    CHARACTER*1
+              = CblasUpper  A is an upper triangular matrix.
+              = CblasLower   A is a lower triangular matrix.
+TRANSA  CHARACTER*1
+              = CblasNoTrans => op( A ) = A
+              = CblasTrans => op( A ) = A**T
+DIAG    CHARACTER*1
+              = CblasUnit if A is unit triangular
+              = CblasNonUnit if A is not unit triangular
+M       number of rows of B
+N       INTEGER number of columns of B
+ALPHA   scalar
+A       DOUBLE PRECISION array LDA*k
+           where k is m when SIDE = 'L'
+             and k is n when SIDE = 'R'
+LDA     dimension of A
+B       DOUBLE PRECISION array LDB*N
+LDB	    dimension of B
+*/
 void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO Uplo, CBLAS_TRANSPOSE transA, const CBLAS_DIAG Diag, const int M, const int N, const double alpha, const double *A, const int lda, double * B, const int ldb) {
   assert(layout == CblasColMajor);
   double lambda;
@@ -55,8 +81,9 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
             }
         }
     }
-    /* A is triangular Upper */
+    /* B = alpha * inv(A) * B */
     else {
+        /* A is triangular Upper */
         if (Uplo == CblasUpper) {
             for (int j = 0; j < N; ++j) {
                 if (alpha != 1.) {
@@ -94,8 +121,11 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
         }
     }
   }
+  /* Right side : X * op( A ) = alpha*B */
   else {
+    /* X = alpha * B * inv(A ** t) */
     if (transA == CblasTrans) {
+        /* A is upper triangular */
         if (Uplo == CblasUpper) {
             for (int j = 0; j < N;j++) {
                 if (alpha != 1.0) {
@@ -118,6 +148,7 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
                 }
             }
         }
+        /* A is lower triangular */
         else {
             for (int j = N-1; j>=0; --j) {
                 if (alpha != 1.0) {
@@ -141,7 +172,9 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
             }
         }
     }
+    /* X = alpha * B * inv(A) */
     else {
+        /* A is upper triangular */
         if (Uplo == CblasUpper) {
             for (int k = N-1; k >= 0; --k) {
                 if (Diag == CblasNonUnit) {
@@ -165,6 +198,7 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
                 }
             }
         }
+        /* A is lower triangular */
         else {
             for (int k = 0; k < N; ++k) {
                 if (Diag == CblasNonUnit) {

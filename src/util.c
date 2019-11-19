@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+// Output a matrix mxn in a file
 void affiche(int m, int n, double *a, int lda, FILE* flux) {
   for (int l = 0; l < m; l++) {
     for (int c = 0; c < n; c++) {
@@ -11,6 +12,7 @@ void affiche(int m, int n, double *a, int lda, FILE* flux) {
   }
 }
 
+// Init matrix
 void init_matrix(double *mat, int m, int n, int lda, double val) {
   /* Be careful with cache effect */
   for (int col = 0; col < n; ++col) {
@@ -20,6 +22,7 @@ void init_matrix(double *mat, int m, int n, int lda, double val) {
   }
 }
 
+// Alloc memory space 
 double* alloc_matrix(int m, int n) {
   return (double*)malloc(m * n * sizeof(double));
 }
