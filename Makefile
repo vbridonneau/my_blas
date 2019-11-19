@@ -23,6 +23,7 @@ test:lib/libmyblas.a driver.o
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
 
 lib/libmyblas.a:$(OBJ)
+	mkdir -p lib/
 	ar crs lib/libmyblas.a $^
 
 clean:
