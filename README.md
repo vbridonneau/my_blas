@@ -6,24 +6,19 @@ Vous trouverez ici les différentes fonctions LAPACK que nous avons implémenté
 
  ```
 ├── Makefile
-├── fichier
-├── fichier
-├── fichier
+├── *.o
+├── include/
+│   	    └── *.h
 ├── src/
-│   	├── hello
-│	├── hello
-│   	└── etc...
+│   	└── *.c
 ├── tst/
-│   	├── hello
-│	├── hello
-│   	└── etc...
-└── src/
-│	├── hello
-│	├── hello
-│   	└── etc...
+│       ├── *-perf
+│   	└── *-perf.c
+└── lib/
+	└── libmyblas.a
 ```
 
-StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
+where * is a blas or lapack function function (e.g. axpy, ger, scal, gemm, ...)
 
 ## Compiler
 
