@@ -20,6 +20,18 @@ Vous trouverez ici les différentes fonctions LAPACK que nous avons implémenté
 
 where * is a blas or lapack function function (e.g. axpy, ger, scal, gemm, ...)
 
+## Environnement GUIX utilisé
+
+Pour avoir le même environnement guix que pour les tests développer :
+```sh
+guix environment --pure mkl git --ad-hoc less gcc-toolchain coreutils mkl emacs -- /bin/bash
+```
+
+**Warning** : Pour compiler les tests getrf, il ne faut pas se mettre sous *guix*, mais être connecter à Plafrim et faire:
+```sh
+module load compiler/gcc/9.1.0 compiler/intel/2019_update4
+```
+
 ## Compiler
 
 Pour compiler le projet faire un 
