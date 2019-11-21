@@ -76,7 +76,7 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
 	    double _size   = (double)size;
 	    double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
 	    double mkltime = (double)(1000000*deltat_mkl.tv_sec + deltat_mkl.tv_usec)*1e-6;
-            printf("%d,%lf,my_dgemm\n%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mytime, flops_dgemm(_size, _size, _size)/mkltime);
+            printf("%d,%lf,my_dgemm\n%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mytime, size, flops_dgemm(_size, _size, _size)/mkltime);
 	    fflush(stdout);
         }
         free(A); free(B); free(C);
