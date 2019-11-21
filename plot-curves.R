@@ -8,11 +8,11 @@ names(stda)[names(stda) == "perf"] = "std"
 stat <- cbind(mean, stda[, 2])
 names(stat)[names(stat) == "stda[, 2]"] = "std"
 print(stat)
-ggplot(stat, aes(x = size, y = perf) + ) + 
+curve <- ggplot(stat, aes(x = size, y = perf)) + 
 	     geom_line() + 
-	     geom_ribbon(aes(ymin = time - std,
-                       	     ymax = time + std), alpha = 0.2)
-			     + labs(x = "size : n", y = "performance (Flops/s)")
+	     geom_ribbon(aes(ymin = perf - std,
+                       	     ymax = perf + std), alpha = 0.2)
+print(curve + labs(x = "size : n", y = "performance (Flops/s)") + ggtitle("Performance for ``gemm\" on mistral02"))
 
 #cover_min <- apply(mean, 2, "
 #plot(mean, sub="Problem scaling", xlab="Vector size", ylab="GFlop/s", type="l", col="red")

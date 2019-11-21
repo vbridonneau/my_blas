@@ -43,8 +43,8 @@ void test_matrix_product() {
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
   char *str[] = {"OK", "NOK"};
-  int r1 = !!testall_dgemm( my_dgemm );
-  //  int r2 = !!testall_dgemm( my_dgemm );
+  // int r1 = !!testall_dgemm( my_dgemm );
+  // int r2 = !!testall_dgemm( my_dgemm );
 }
 
 #ifndef timersub
@@ -53,8 +53,8 @@ void test_matrix_product() {
 
 void test_dgemm_perf(int start, int end, int step, int nsample) {
     int size;
-    struct timeval startt, endt, deltat;
-    printf("size,perf\n");
+    struct timeval startt, endt, deltat_my, deltat_mkl;
+    printf("size,myperf,function\n");
     for (size = start; size < end; size = (size*(100 + step))/100) {
         double *A, *B, *C;
         A = tmp_alloc_matrix(size, size, 0.0);
@@ -63,13 +63,21 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
         for (int sample = 0; sample < nsample; ++sample) {
             rnd_matrix_buff(A, 1, 10, size * size, size);
             rnd_matrix_buff(B, 1, 10, size * size, size);
+	    /* Start with our version */
             gettimeofday(&startt, NULL);
-            my_dgemm_scalaire(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+            my_dgemm_scalaire(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
             gettimeofday(&endt, NULL);
-            timersub(&endt, &startt, &deltat);
-	    double _size = (double)size;
-	    double time  = (double)(1000000*deltat.tv_sec + deltat.tv_usec)*1e-6;
-            printf("%d,%lf\n", size, flops_dgemm(_size, _size, _size)/time);
+            timersub(&endt, &startt, &deltat_my);
+	    /* Followed by MKL one */
+	    gettimeofday(&startt, NULL);
+	    cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+            gettimeofday(&endt, NULL);
+            timersub(&endt, &startt, &deltat_mkl);
+	    double _size   = (double)size;
+	    double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+	    double mkltime = (double)(1000000*deltat_mkl.tv_sec + deltat_mkl.tv_usec)*1e-6;
+            printf("%d,%lf,my_dgemm\n%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mytime, flops_dgemm(_size, _size, _size)/mkltime);
+	    fflush(stdout);
         }
         free(A); free(B); free(C);
     }
