@@ -40,14 +40,14 @@ void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
         my_dgetf2( Order, m, n, a, lda );
     }
     else {
-        for(j=0; j<min( m, n ); j+=nb) {
-            jb = min( min( m, n )-j+1, nb );
-            my_dgetf2( Order, m-j+1, jb, &a[j+ j*lda], lda);
+        for(j = 0; j < min( m, n ); j += nb) {
+            jb = min( min( m, n ) - j, nb );
+            my_dgetf2( Order, m-j, jb, a + j + j*lda, lda);
 
-            if( j+jb < n && j+jb < m ) {
-                my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb+1, 1., &a[j+ j*lda], lda, &a[j +(j+jb)*lda], lda );
-                if( j+jb<=m ) {
-                    my_dgemm( Order, CblasNoTrans, CblasNoTrans, m-j-jb+1,n-j-jb+1, jb, -1., &a[j+jb + j*lda], lda, &a[j + (j+jb)*lda], lda, 1., &a[j + jb + (j+jb)*lda], lda );
+            if( j+jb < n ) {
+	      my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb, 1., a + j*(1 + lda), lda, a + j +(j+jb)*lda, lda );
+                if( j+jb < m ) {
+                    my_dgemm( Order, CblasNoTrans, CblasNoTrans, m-j-jb,n-j-jb, jb, -1., a + j+jb + j*lda, lda, a + j + (j+jb)*lda, lda, 1., a + j + jb + (j+jb)*lda, lda );
                 }
             }
         }
