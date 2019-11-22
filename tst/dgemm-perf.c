@@ -5,14 +5,6 @@
 #include "dgemm.h"
 #include "algonum.h"
 
-static double* tmp_alloc_matrix(int m, int n, double val) {
-    double *res = malloc(m * n * sizeof(double));
-    for (int i = 0; i < m*n; i++) {
-        res[i] = val;
-    }
-    return res;
-}
-
 static void fill_succesion(double *v, int m, int n) {
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
@@ -46,10 +38,6 @@ void test_matrix_product() {
   // int r1 = !!testall_dgemm( my_dgemm );
   // int r2 = !!testall_dgemm( my_dgemm );
 }
-
-#ifndef timersub
-#define timersub(a, b, result) do { (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; (result)->tv_usec = (a)->tv_usec - (b)->tv_usec; if ((result)->tv_usec < 0) { --(result)->tv_sec; (result)->tv_usec += 1000000; } } while (0)
-#endif//timersub
 
 void test_dgemm_perf(int start, int end, int step, int nsample) {
     int size;

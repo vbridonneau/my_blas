@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+double* tmp_alloc_matrix(int m, int n, double val) {
+    double *res = malloc(m * n * sizeof(double));
+    for (int i = 0; i < m*n; i++) {
+        res[i] = val;
+    }
+    return res;
+}
+
+
 // Output a matrix mxn in a file
 void affiche(int m, int n, double *a, int lda, FILE* flux) {
   for (int l = 0; l < m; l++) {
@@ -22,7 +31,7 @@ void init_matrix(double *mat, int m, int n, int lda, double val) {
   }
 }
 
-// Alloc memory space 
+// Alloc memory space
 double* alloc_matrix(int m, int n) {
   return (double*)malloc(m * n * sizeof(double));
 }
