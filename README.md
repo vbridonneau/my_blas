@@ -31,6 +31,7 @@ guix environment --pure mkl git --ad-hoc less gcc-toolchain coreutils mkl emacs 
 ```sh
 module load compiler/gcc/9.1.0 compiler/intel/2019_update4
 ```
+Il faut également retirer du *makefile* la version de *MKL* utilisée (conflit avec celle utilisée pour compiler les testeurs de la *libalgonum.so*.
 
 ## Compiler
 

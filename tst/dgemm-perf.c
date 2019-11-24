@@ -34,51 +34,59 @@ void test_matrix_product() {
   /* my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M); */
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
-  char *str[] = {"OK", "NOK"};
   // int r1 = !!testall_dgemm( my_dgemm );
   // int r2 = !!testall_dgemm( my_dgemm );
 }
 
 void test_dgemm_perf(int start, int end, int step, int nsample) {
-    int size;
-    struct timeval startt, endt, deltat_my, deltat_mkl;
-    printf("size,perf,function\n");
-    for (size = start; size < end; size = (size*(100 + step))/100) {
-        double *A, *B, *C;
-        A = tmp_alloc_matrix(size, size, 0.0);
-        B = tmp_alloc_matrix(size, size, 0.0);
-        C = tmp_alloc_matrix(size, size, 0.0);
-        for (int sample = 0; sample < nsample; ++sample) {
-            rnd_matrix_buff(A, 1, 10, size * size, size);
-            rnd_matrix_buff(B, 1, 10, size * size, size);
-	    /* Start with our version */
-            gettimeofday(&startt, NULL);
-            my_dgemm_scalaire(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
-            gettimeofday(&endt, NULL);
-            timersub(&endt, &startt, &deltat_my);
-	    /* Followed by MKL one */
-	    gettimeofday(&startt, NULL);
-	    cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
-            gettimeofday(&endt, NULL);
-            timersub(&endt, &startt, &deltat_mkl);
-	    double _size   = (double)size;
-	    double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
-	    double mkltime = (double)(1000000*deltat_mkl.tv_sec + deltat_mkl.tv_usec)*1e-6;
-            printf("%d,%lf,my_dgemm\n%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mytime, size, flops_dgemm(_size, _size, _size)/mkltime);
-	    fflush(stdout);
-        }
-        free(A); free(B); free(C);
+  int size;
+  struct timeval startt, endt, deltat_my, deltat_mkl;
+  printf("size,perf,function\n");
+  for (size = start; size < end; size = (size*(100 + step))/100) {
+    double *A, *B, *C;
+    A = tmp_alloc_matrix(size, size, 0.0);
+    B = tmp_alloc_matrix(size, size, 0.0);
+    C = tmp_alloc_matrix(size, size, 0.0);
+    for (int sample = 0; sample < nsample; ++sample) {
+      double _size   = (double)size;
+      rnd_matrix_buff(A, 1, 10, size * size, size);
+      rnd_matrix_buff(B, 1, 10, size * size, size);
+      /* Start with our version */
+      gettimeofday(&startt, NULL);
+      my_dgemm_scalaire(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+      gettimeofday(&endt, NULL);
+      timersub(&endt, &startt, &deltat_my);
+      double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+      printf("%d,%lf,my_dgemm_scalaire\n", size, flops_dgemm(_size, _size, _size)/mytime);
+	    
+      /* Then our blocked version */
+      gettimeofday(&startt, NULL);
+      my_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+      gettimeofday(&endt, NULL);
+      timersub(&endt, &startt, &deltat_my);
+      mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+      printf("%d,%lf,my_dgemm\n", size, flops_dgemm(_size, _size, _size)/mytime);
+      /* Followed by MKL one */
+      gettimeofday(&startt, NULL);
+      cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+      gettimeofday(&endt, NULL);
+      timersub(&endt, &startt, &deltat_mkl);
+      double mkltime = (double)(1000000*deltat_mkl.tv_sec + deltat_mkl.tv_usec)*1e-6;
+      printf("%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mkltime);
+      fflush(stdout);
     }
+    free(A); free(B); free(C);
+  }
 }
 
 int main(int argc, char **argv) {
-    if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
-    int start, end, step, nsample;
-    start   = atoi(argv[1]);
-    end     = atoi(argv[2]);
-    step    = atoi(argv[3]);
-    nsample = atoi(argv[4]);
-    // test_matrix_product();
-    test_dgemm_perf(start, end, step, nsample);
-    return EXIT_SUCCESS;
+  if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
+  int start, end, step, nsample;
+  start   = atoi(argv[1]);
+  end     = atoi(argv[2]);
+  step    = atoi(argv[3]);
+  nsample = atoi(argv[4]);
+  // test_matrix_product();
+  test_dgemm_perf(start, end, step, nsample);
+  return EXIT_SUCCESS;
 }

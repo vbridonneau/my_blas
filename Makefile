@@ -1,6 +1,6 @@
 CC=gcc
 LIB_ALGO_NUM_PATH=/home/cisd-faverge/algonum/lib
-CFLAGS=-g -O0 --std=c99 -I./include/ #-Wl,-rpath,$(LIB_ALGO_NUM_PATH)
+CFLAGS=--std=c99 -I./include/ #-Wl,-rpath,$(LIB_ALGO_NUM_PATH)
 LDFLAGS=-lm #-L$(LIB_ALGO_NUM_PATH) -lalgonum
 SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c dgetrf.c dtrsm.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
