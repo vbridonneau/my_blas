@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdbool.h>
-#include <cblas.h>
+#include <string.h>
+#include "cblas.h"
 #include "dtrsm.h"
 #include "algonum.h"
 
@@ -39,9 +40,7 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
   /* scale 0. */
   if (alpha == 0.) {
     for(int j = 0; j < N; ++j) {
-      for (int i = 0; i < M; ++i) {
-	B[i + j * ldb] = 0.;
-      }
+      memset(B + j * ldb, 0, M * sizeof(double));
     }
     return;
   }
