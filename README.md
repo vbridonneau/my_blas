@@ -27,6 +27,11 @@ Pour avoir le même environnement guix que pour les tests développer :
 guix environment --pure mkl git --ad-hoc less gcc-toolchain coreutils mkl emacs -- /bin/bash
 ```
 
+En cas d'OPENMP :
+```sh
+export OMP_NUM_THREADS=40
+```
+
 **Warning** : Pour compiler les tests getrf, il ne faut pas se mettre sous *guix*, mais être connecter à Plafrim et faire:
 ```sh
 module load compiler/gcc/9.1.0 compiler/intel/2019_update4
