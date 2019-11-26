@@ -201,16 +201,16 @@ void my_dgemm(const CBLAS_LAYOUT Order, const enum CBLAS_TRANSPOSE TransA, const
 
       double *Ctranslated = C + (i + j*ldc)*BLOCK_SIZE;
       for(int l = 0; l < i_blk_size; ++l) {
-	for(int c = 0; c < j_blk_size; ++c) {
-	  Ctranslated[l + c*ldc] *= beta;
-	}
+        for(int c = 0; c < j_blk_size; ++c) {
+          Ctranslated[l + c*ldc] *= beta;
+        }
       }
 
       for(int k = 0; k < kbloc; ++k) {
-	int k_blk_size = (k < kbloc - 1 || !lastk) ? BLOCK_SIZE : lastk;
-	if(!k_blk_size || !i_blk_size || !j_blk_size) continue;
-	int shiftA     = (transA) * (k + i*lda) + (1-transA) * (i + k*lda);
-	int shiftB     = (transB) * (j + k*ldb) + (1-transB) * (k + j*ldb);
+        int k_blk_size = (k < kbloc - 1 || !lastk) ? BLOCK_SIZE : lastk;
+        if(!k_blk_size || !i_blk_size || !j_blk_size) continue;
+        int shiftA     = (transA) * (k + i*lda) + (1-transA) * (i + k*lda);
+        int shiftB     = (transB) * (j + k*ldb) + (1-transB) * (k + j*ldb);
         my_dgemm_scalaire(Order, TransA, TransB,
 			  i_blk_size,
 			  j_blk_size,
