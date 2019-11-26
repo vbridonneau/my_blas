@@ -92,7 +92,7 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
 	  }
 	  for (int k = M - 1; k >= 0; --k) {
 	    if (B[k + j*ldb]) {
-	      if (Diag != CblasNonUnit) B[k + j*ldb] /= A[k*(1 + lda)];
+	      if (Diag == CblasNonUnit) B[k + j*ldb] /= A[k*(1 + lda)];
 	      lambda = B[k + j*ldb];
 	      for (int i = 0; i < k; ++i) {
 		B[i + j*ldb] -= lambda*A[i + k*lda];
@@ -108,10 +108,11 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
 	    B[i + j*ldb] *= alpha;
 	  }
 	  for (int k = 0; k < M; ++k) {
-	    if (B[k + j*ldb]) {
-	      if (Diag != CblasNonUnit) B[k + j*ldb] /= A[k*(1 + lda)];
+	    if (B[k + j*ldb] != 0.) {
+	      if (Diag == CblasNonUnit)
+		B[k + j*ldb] /= A[k*(1 + lda)];
 	      lambda = B[k + j*ldb];
-	      for (int i = k+1; k < M; ++k) {
+	      for (int i = k+1; i < M; ++i) {
 		B[i + j*ldb] -= lambda*A[i + k*lda];
 	      }
 	    }
@@ -132,7 +133,7 @@ void my_dtrsm(const CBLAS_LAYOUT layout, const CBLAS_SIDE Side, const CBLAS_UPLO
 	      B[i + j*ldb] *= alpha;
 	    }
 	  }
-	  for (int k = 0; k < j; k++) {
+	  for (int k = 0; k < j - 1; k++) {
 	    if (A[k+j*lda] != 0.0) {
 	      for(int i = 0;i < M;i++) {
 		B[i + j*ldb] -= A[k+j*lda] * B[i + k*ldb];
