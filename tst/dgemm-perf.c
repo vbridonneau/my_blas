@@ -34,7 +34,7 @@ void test_matrix_product() {
   /* my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M); */
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
-  // int r1 = !!testall_dgemm( my_dgemm_scal_openmp );
+  int r1 = !!testall_dgemm( my_dgemm_scal_openmp );
   // int r2 = !!testall_dgemm( my_dgemm );
 }
 
@@ -80,13 +80,13 @@ void test_dgemm_perf(int start, int end, int step, int nsample) {
 }
 
 int main(int argc, char **argv) {
-  if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;}
-  int start, end, step, nsample;
-  start   = atoi(argv[1]);
-  end     = atoi(argv[2]);
-  step    = atoi(argv[3]);
-  nsample = atoi(argv[4]);
-  test_dgemm_perf(start, end, step, nsample);
-  // test_matrix_product();
+  /* if (argc < 5) {fprintf(stderr, "argc < 5!\n"); return EXIT_FAILURE;} */
+  /* int start, end, step, nsample; */
+  /* start   = atoi(argv[1]); */
+  /* end     = atoi(argv[2]); */
+  /* step    = atoi(argv[3]); */
+  /* nsample = atoi(argv[4]); */
+  /* test_dgemm_perf(start, end, step, nsample); */
+  test_matrix_product();
   return EXIT_SUCCESS;
 }

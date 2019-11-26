@@ -25,10 +25,6 @@ void my_dgetf2(const CBLAS_LAYOUT Order, int M, int N, double* a, int lda ) {
     }
 }
 
-void my_dgetrf2() {
-    // TODO
-}
-
 void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
   int j, jb, nb;
   double one = 1.0;
