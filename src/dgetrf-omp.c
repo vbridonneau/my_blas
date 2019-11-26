@@ -21,17 +21,17 @@ void my_dgetrf_omp(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) 
   /* Fisrt step */
   my_dgetrf( Order, m, nb, a, lda);
   if (nb < n) {
-    cblas_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, nb, n - nb, 1., a, lda, a + nb*lda, lda);
+    my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, nb, n - nb, 1., a, lda, a + nb*lda, lda);
     if (nb < m)
-      my_dgemm_scal_omp(Order, CblasNoTrans, CblasNoTrans, m - nb, n - nb, nb, -1., a + nb, lda, a + nb*lda, 1., a + nb * (1 + lda), lda);
+      my_dgemm_scal_openmp(Order, CblasNoTrans, CblasNoTrans, m - nb, n - nb, nb, -1., a + nb, lda, a + nb*lda, lda, 1., a + nb * (1 + lda), lda);
   }
 
   /* Second step */
   my_dgetrf( Order, m - nb, nb, a + nb * (1 + lda), lda);
   if (2*nb < n) {
-    cblas_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, nb, n - 2*nb, 1., a + nb * (1 + lda), lda, a + nb + 2*nb*lda, lda);
+    my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, nb, n - 2*nb, 1., a + nb * (1 + lda), lda, a + nb + 2*nb*lda, lda);
     if (2*nb < m)
-      my_dgemm_scal_omp( Order, CblasNoTrans, CblasNoTrans, m - 2*nb, n - 2*nb, nb, -1., a + 2*nb + nb*lda, lda, a + nb + 2*nb*lda, lda, 1., a + 2*nb*(1 + lda), lda);
+      my_dgemm_scal_openmp( Order, CblasNoTrans, CblasNoTrans, m - 2*nb, n - 2*nb, nb, -1., a + 2*nb + nb*lda, lda, a + nb + 2*nb*lda, lda, 1., a + 2*nb*(1 + lda), lda);
   }
   
   /* for(j = 0; j < min( m, n ); j += nb) { */
