@@ -2,75 +2,67 @@
 #include "dgemm.h"
 #include "algonum.h"
 #include <cblas.h>
+#include <stdio.h>
 
 #define BLOCK_SIZE 100
 void my_dgemm_tile(const CBLAS_LAYOUT Order, 
-      const enum CBLAS_TRANSPOSE TransA, 
-      const enum CBLAS_TRANSPOSE TransB, 
-      const int M, 
-      const int N, 
-      const int K, 
-      const double alpha, 
-      const double **A, 
-      const int lda, 
-      const double **B, 
-      const int ldb, 
-      const double beta, 
-      double **C, 
-      const int ldc) {
-
+		   const enum CBLAS_TRANSPOSE TransA, 
+		   const enum CBLAS_TRANSPOSE TransB, 
+		   const int M, 
+		   const int N, 
+		   const int K,
+		   const int b,
+		   const double alpha, 
+		   const double **A, 
+		   const double **B, 
+		   const double beta, 
+		   double **C) {
   if (Order != CblasColMajor) return;
   int transA = (TransA == CblasTrans);
   int transB = (TransB == CblasTrans);
-  int kbloc, nbloc, mbloc;
 
-  if (K % BLOCK_SIZE)
-    kbloc = (K + BLOCK_SIZE)/BLOCK_SIZE;
-  else
-    kbloc =  K/ BLOCK_SIZE;
-  if (M % BLOCK_SIZE)
-    mbloc = (M + BLOCK_SIZE)/BLOCK_SIZE;
-  else
-    mbloc = M / BLOCK_SIZE;
-  if (N % BLOCK_SIZE)
-    nbloc = (N + BLOCK_SIZE)/BLOCK_SIZE;
-  else
-    nbloc = N / BLOCK_SIZE;
+  if(b == 0) return;
+
+  /* Upper bound for tile in m, n, k */
+  int MT, NT, KT;
+  MT = (M + b - 1) / b;
+  NT = (N + b - 1) / b;
+  KT = (K + b - 1) / b;
+
   
   /* Reminders */
-  int lastk = K % BLOCK_SIZE;
-  int lastm = M % BLOCK_SIZE;
-  int lastn = N % BLOCK_SIZE;
+  int lastk = K % b;
+  int lastm = M % b;
+  int lastn = N % b;
 
-  for (int i = 0; i < mbloc; ++i) {
-    int i_blk_size = (i < mbloc - 1 || !lastm) ? BLOCK_SIZE : lastm;
-    #pragma omp parallel for
-    for (int j = 0; j < nbloc; ++j) {
-      int j_blk_size = (j < nbloc - 1 || !lastn) ? BLOCK_SIZE : lastn;
+  for (int i = 0; i < MT; ++i) {
+    int i_blk_size = (i < MT - 1 || !lastm) ? b : lastm;
+    for (int j = 0; j < NT; ++j) {
+      int j_blk_size = (j < NT - 1 || !lastn) ? b : lastn;
 
-	double * blockC = C[j * BLOCK_SIZE + i];
+      double * blockC = C[j * MT + i];
 
       for(int l = 0; l < i_blk_size; ++l) {
         for(int c = 0; c < j_blk_size; ++c) {
-          blockC[l + c*BLOCK_SIZE] *= beta;
+          blockC[l + c*b] *= beta;
         }
       }
 
-      for(int k = 0; k < kbloc; ++k) {
-        int k_blk_size = (k < kbloc - 1 || !lastk) ? BLOCK_SIZE : lastk;
+      for(int k = 0; k < KT; ++k) {
+        int k_blk_size = (k < KT - 1 || !lastk) ? b : lastk;
         if(!k_blk_size || !i_blk_size || !j_blk_size) continue;
 
-	double * blockA = (transA)? A[k*BLOCK_SIZE + i] : A[i*BLOCK_SIZE + k];
-	double * blockB = (transB)? B[j*BLOCK_SIZE + k] : A[k*BLOCK_SIZE + j];
+	const double * blockA = (!transA)? A[k*MT + i] : A[i*KT + k];
+	const double * blockB = (!transB)? B[j*KT + k] : B[k*NT + j];
 
-        my_dgemm_scal_openmp(Order, TransA, TransB,
+        my_dgemm_scalaire(Order, TransA, TransB,
 			  i_blk_size,
 			  j_blk_size,
 			  k_blk_size,
 			  alpha,
-			  blockA, BLOCK_SIZE,
-			  blockB, BLOCK_SIZE,
-			  1., blockC, ldc);
+			  blockA, b,
+			  blockB, b,
+			  1., blockC, b);
       }
     }
   }

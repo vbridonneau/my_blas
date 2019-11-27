@@ -36,7 +36,7 @@ int my_dgemm_tile_wrapper(const CBLAS_LAYOUT Order,
 	double ** b = lapack2tile(M, N, K, B, ldb);
 	double ** c = lapack2tile(M, N, K, C, ldc);
 
-	my_dgemm_tile(Order, TransA, TransB, M, N, K, alpha, a, lda, b, ldb, beta, c, ldc);
+	//my_dgemm_tile(Order, TransA, TransB, M, N, K, alpha, a, lda, b, ldb, beta, c, ldc);
 
 	tile2lapack(M, N, K, c, C, ldc);
 
@@ -61,7 +61,7 @@ void test_matrix_product() {
   /* my_dgemm(COLUMN_MAJOR, 'n', 'n', M, N, K, 1.0, A, M, B, K, 0.0, C, M); */
   /* fprintf(stdout, "C %d %d\n", M, N); affiche(M, N, C, M, stdout); */
   /* free(A);free(B);free(C); */
-  int r1 = !!testall_dgemm( my_dgemm_tile_wrapper );
+  int r1 = !!testall_dgemm_tiled( my_dgemm_tile );
   // int r2 = !!testall_dgemm( my_dgemm );
 }
 
