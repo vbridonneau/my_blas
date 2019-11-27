@@ -11,8 +11,9 @@ def main():
     datas   = pd.read_csv(sys.argv[1])
     
     plot  = sns.lineplot(x=datas["size"], y=datas["perf"],
-                         hue=datas['function'],
+                         hue=datas['bloc-size'],
                          err_style='band', legend='full')
+    plt.legend(loc="best")
     plt.xlabel("Size (n)")
     plt.ylabel("Performance (Flops/s)")
     plt.title(title)
