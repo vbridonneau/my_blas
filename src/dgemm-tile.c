@@ -35,10 +35,13 @@ void my_dgemm_tile(const CBLAS_LAYOUT Order,
   int lastm = M % b;
   int lastn = N % b;
 
-  for (int i = 0; i < MT; ++i) {
-    int i_blk_size = (i < MT - 1 || !lastm) ? b : lastm;
-    for (int j = 0; j < NT; ++j) {
-      int j_blk_size = (j < NT - 1 || !lastn) ? b : lastn;
+  for (int j = 0; j < NT; ++j) {
+    int j_blk_size = (j < NT - 1 || !lastn) ? b : lastn;
+
+#pragma omp parallel for
+    for (int i = 0; i < MT; ++i) {
+      int i_blk_size = (i < MT - 1 || !lastm) ? b : lastm;
+
 
       double * blockC = C[j * MT + i];
 
