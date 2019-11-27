@@ -2,7 +2,7 @@ CC=gcc
 LIB_ALGO_NUM_PATH=/home/cisd-faverge/algonum/lib
 CFLAGS=-O0 -g --std=c99 -fopenmp -I./include/ -Wl,-rpath,$(LIB_ALGO_NUM_PATH)
 LDFLAGS=-lm -L$(LIB_ALGO_NUM_PATH) -lalgonum
-SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c dgetrf.c dtrsm.c dgemm_omp.c dgetrf-omp.c
+SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c dgetrf.c dtrsm.c dgemm_omp.c dgetrf-omp.c dgemm-tile.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
 

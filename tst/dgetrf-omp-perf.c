@@ -40,6 +40,6 @@ int main(int argc, char **argv) {
   /* step    = atoi(argv[3]); */
   /* nsample = atoi(argv[4]); */
   /* test_dgetrf_perf(start, end, step, nsample); */
-  printf("%d\n", testall_dgetrf( my_dgetrf ));
+  printf("%d\n", testall_dgetrf( my_dgetrf_omp ));
   return EXIT_SUCCESS;
 }
