@@ -59,8 +59,6 @@ void my_dgemm_tile(const CBLAS_LAYOUT Order,
       for(int k = 0; k < kbloc; ++k) {
         int k_blk_size = (k < kbloc - 1 || !lastk) ? BLOCK_SIZE : lastk;
         if(!k_blk_size || !i_blk_size || !j_blk_size) continue;
-        int shiftA     = (transA) * (k + i*lda) + (1-transA) * (i + k*lda);
-        int shiftB     = (transB) * (j + k*ldb) + (1-transB) * (k + j*ldb);
 
 	double * blockA = (transA)? A[k*BLOCK_SIZE + i] : A[i*BLOCK_SIZE + k];
 	double * blockB = (transB)? B[j*BLOCK_SIZE + k] : A[k*BLOCK_SIZE + j];
