@@ -52,7 +52,7 @@ void my_dgemm_tile(const CBLAS_LAYOUT Order,
 
       for(int l = 0; l < i_blk_size; ++l) {
         for(int c = 0; c < j_blk_size; ++c) {
-//          blockC[l + c*BLOCK_SIZE] *= beta;
+          blockC[l + c*BLOCK_SIZE] *= beta;
         }
       }
 
