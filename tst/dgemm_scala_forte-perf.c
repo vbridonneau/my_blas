@@ -36,21 +36,23 @@ void test_dgemm_perf(int start, int end, int step, int nsample, int number_threa
       rnd_matrix_buff(A, 1, 10, size * size, size);
       rnd_matrix_buff(B, 1, 10, size * size, size);
 
-      /* Then our blocked version */
+      /* blocked version */
+      // gettimeofday(&startt, NULL);
+      // my_dgemm_omp(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 1., C, size);
+      // gettimeofday(&endt, NULL);
+      // timersub(&endt, &startt, &deltat_my);
+      // double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+      // printf("%d,%lf,%d\n", size, mytime, number_thread);
+      
+      /* scalar version */
       gettimeofday(&startt, NULL);
-      my_dgemm_omp(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 1., C, size);
+      my_dgemm_scal_openmp(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
       gettimeofday(&endt, NULL);
       timersub(&endt, &startt, &deltat_my);
       double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
-      printf("%d,%lf,Avec %d thread\n", size, flops_dgemm(_size, _size, _size)/mytime, number_thread);
-      
-      /* Followed by MKL one */
-      /* gettimeofday(&startt, NULL); */
-      /* cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size); */
-      /* gettimeofday(&endt, NULL); */
-      /* timersub(&endt, &startt, &deltat_mkl); */
-      /* double mkltime = (double)(1000000*deltat_mkl.tv_sec + deltat_mkl.tv_usec)*1e-6; */
-      /* printf("%d,%lf,cblas_dgemm\n", size, flops_dgemm(_size, _size, _size)/mkltime); */
+      printf("%d,%lf,%d\n", size, mytime, number_thread);
+
+
       fflush(stdout);
     }
     free(A); free(B); free(C);
@@ -65,10 +67,10 @@ int main(int argc, char **argv) {
   step    = atoi(argv[3]);
   nsample = atoi(argv[4]);
 
-  int number_thread[] = {5};
+  int number_thread[] = {1, 2, 3, 5, 8, 10, 15, 20, 30, 40, 60, 80};
 
   int i;
-  printf("SIZE,PERF,THREADS\n");
+  printf("SIZE,TIME,THREADS\n");
 
   for (i=0; i<sizeof(number_thread); i++) {
     omp_set_dynamic(0);     // Explicitly disable dynamic teams
