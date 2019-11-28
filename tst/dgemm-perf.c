@@ -14,6 +14,16 @@ static void fill_succesion(double *v, int m, int n) {
     }
 }
 
+
+#ifndef SIZE
+#define SIZE 10
+#endif//SIZE
+
+
+const int M = 255;
+const int K = 130;
+const int N = 64;
+
 void test_matrix_product() {
   /* double *A, *B, *C; */
   /* A = tmp_alloc_matrix(M, K, 0.0); rnd_matrix_buff(A, 1, 10, M * K, 1); */
