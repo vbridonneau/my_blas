@@ -9,4 +9,6 @@ void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda );
 
 void my_dgetrf_omp(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda );
 
+void my_dgetrf_tile(const CBLAS_LAYOUT Order, int m, int n, double** a, int lda );
+
 #endif//DEF_DGETRF_H

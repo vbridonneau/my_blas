@@ -17,7 +17,7 @@ static void fill_succesion(double *v, int m, int n) {
 #define SIZE 10
 #endif//SIZE
 
-
+/*
 int my_dgemm_tile_wrapper(const CBLAS_LAYOUT Order, 
       const enum CBLAS_TRANSPOSE TransA, 
       const enum CBLAS_TRANSPOSE TransB, 
@@ -42,7 +42,7 @@ int my_dgemm_tile_wrapper(const CBLAS_LAYOUT Order,
 
 	return 0;
 }
-
+*/
 
 const int M = 255;
 const int K = 130;
