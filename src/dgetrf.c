@@ -5,10 +5,7 @@
 #include "dger.h"
 #include "dtrsm.h"
 #include "dgemm.h"
-
-static inline int min(const int a, const int b) {
-    return (a < b) ? a : b;
-}
+#include "util.h"
 
 void my_dgetf2(const CBLAS_LAYOUT Order, int M, int N, double* a, int lda ) {
     int nstep = min(M, N);
