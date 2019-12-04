@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "util.h"
+
 
 double* tmp_alloc_matrix(int m, int n, double val) {
     double *res = malloc(m * n * sizeof(double));
@@ -59,4 +61,8 @@ int eq_double(double a, double b, double eps) {
 
 int min(const int a, const int b) {
   return (a < b) ? a : b;
+}
+
+int max(const int a, const int b) {
+    return (a > b) ? a : b;
 }
