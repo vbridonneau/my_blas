@@ -6,7 +6,7 @@
 #include "dgemm.h"
 #include "algonum.h"
 #include "unistd.h"
-
+#include <stdbool.h>
 
 double epsilon = 0.0001;
 int max_width = 500;
@@ -36,10 +36,27 @@ void test_dgemm(dgemm_fct_t dgemm) {
 
     int m = max_width;
     int n = max_height;
+    int i;
 
     dgemm_ref(CblasColMajor, CblasTrans, CblasNoTrans, m, n, m, 1., a, n, b, n, 0.0, c_expected, n);
+    dgemm(CblasColMajor, CblasTrans, CblasNoTrans, m, n, m, 1., a, n, b, n, 0.0, c_actual, n);
 
-    printf("\033[0;32mPASS\033[0m square\n");
+    bool passed = true;
+    for(i=0;i<m*n;i++) {
+        if(abs(c_actual[i]-c_expected[i]) > epsilon) {
+            passed = false;
+            break;
+        }
+    }
+
+    if (passed) {
+        printf("\033[0;32mPASS\033[0m");
+    }
+    else {
+        printf("\033[0;31mFAIL\033[0m");
+    }
+
+    printf(" square\n");
 
     free(a);
     free(b);
