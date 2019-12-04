@@ -1,4 +1,5 @@
 CC=gcc
+MPICC=mpicc
 LIB_ALGO_NUM_PATH=/home/cisd-faverge/algonum/lib
 CFLAGS=-O0 -g --std=c99 -fopenmp -I./include/ -Wl,-rpath,$(LIB_ALGO_NUM_PATH)
 LDFLAGS=-lm -L$(LIB_ALGO_NUM_PATH) -lalgonum
@@ -12,8 +13,8 @@ test:lib/libmyblas.a driver.o
 	${CC} ${CFLAGS} -o test ${OBJ} driver.o -L./lib/ -lmyblas ${LDFLAGS}
 	./test
 
-%-perf:lib/libmyblas.a %-perf.o
-	${CC} ${CFLAGS} -o tst/$@ $^ -L./lib/ -lmyblas ${LDFLAGS} #-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
+%-perf:%-perf.o lib/libmyblas.a
+	${CC} ${CFLAGS} -o tst/$@ $< -L./lib/ -lmyblas ${LDFLAGS} #-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
 
 #-DMKL_ILP64 -m64 -I${MKLROOT}/include
 %-perf.o:tst/%-perf.c
@@ -21,6 +22,9 @@ test:lib/libmyblas.a driver.o
 
 %.o:src/%.c
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
+
+p%.o:src/p%.c
+	${MPICC} ${CFLAGS} -c $< ${LDFLAGS}
 
 lib/libmyblas.a:$(OBJ)
 	mkdir -p lib/

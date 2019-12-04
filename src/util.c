@@ -56,3 +56,7 @@ void rnd_matrix_buff(double *v, int bottom, int up, int size, int seed) {
 int eq_double(double a, double b, double eps) {
   return fabs(a - b) < eps;
 }
+
+int min(const int a, const int b) {
+  return (a < b) ? a : b;
+}
