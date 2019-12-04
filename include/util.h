@@ -1,12 +1,17 @@
 #ifndef DEF_UTIL_H
 #define DEF_UTIL_H
+
 #include <stdio.h>
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 inline int min(const int a, const int b) {
-  return (a < b) ? a : b;
+    return (a < b) ? a : b;
+}
+
+int max(const int a, const int b) {
+    return (a > b) ? a : b;
 }
 
 #ifndef timersub

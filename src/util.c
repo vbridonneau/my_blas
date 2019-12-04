@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "util.h"
+
 
 double* tmp_alloc_matrix(int m, int n, double val) {
     double *res = malloc(m * n * sizeof(double));

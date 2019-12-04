@@ -19,7 +19,6 @@ static void fill_succesion(double *v, int m, int n) {
 #define SIZE 10
 #endif//SIZE
 
-
 const int M = 255;
 const int K = 130;
 const int N = 64;
