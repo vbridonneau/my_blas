@@ -35,7 +35,14 @@ void test_dgemm_perf(int start, int end, int step, int nsample, int number_threa
       double _size   = (double)size;
       rnd_matrix_buff(A, 1, 10, size * size, size);
       rnd_matrix_buff(B, 1, 10, size * size, size);
-
+      /* Normal version */
+      // gettimeofday(&startt, NULL);
+      // my_dgemm_scalaire(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 0.0, C, size);
+      // gettimeofday(&endt, NULL);
+      // timersub(&endt, &startt, &deltat_my);
+      // double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+      // printf("%d,%lf,en séquentiel\n", size, flops_dgemm(_size, _size, _size)/mytime, number_thread);
+	    
       /* Then our blocked version */
       gettimeofday(&startt, NULL);
       my_dgemm_omp(CblasColMajor, CblasTrans, CblasNoTrans, size, size, size, 1., A, size, B, size, 1., C, size);
@@ -65,7 +72,7 @@ int main(int argc, char **argv) {
   step    = atoi(argv[3]);
   nsample = atoi(argv[4]);
 
-  int number_thread[] = {5};
+  int number_thread[] = {10, 40, 80};
 
   int i;
   printf("SIZE,PERF,THREADS\n");

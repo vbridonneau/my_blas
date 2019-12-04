@@ -40,10 +40,10 @@ void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda ) {
       my_dgetf2( Order, m-j, jb, a + j + j*lda, lda);
 
       if( j+jb < n ) {
-	my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb, 1., a + j*(1 + lda), lda, a + j +(j+jb)*lda, lda );
-	if( j+jb < m ) {
-	  my_dgemm( Order, CblasNoTrans, CblasNoTrans, m-j-jb,n-j-jb, jb, -1., a + j+jb + j*lda, lda, a + j + (j+jb)*lda, lda, 1., a + j + jb + (j+jb)*lda, lda );
-	}
+          my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, n-j-jb, 1., a + j*(1 + lda), lda, a + j +(j+jb)*lda, lda );
+          if( j+jb < m ) {
+            my_dgemm( Order, CblasNoTrans, CblasNoTrans, m-j-jb,n-j-jb, jb, -1., a + j+jb + j*lda, lda, a + j + (j+jb)*lda, lda, 1., a + j + jb + (j+jb)*lda, lda );
+          }
       }
     }
   }
