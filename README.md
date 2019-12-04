@@ -18,10 +18,12 @@ Vous trouverez ici les différentes fonctions LAPACK que nous avons implémenté
 	└── libmyblas.a
 ```
 
-where * is a blas or lapack function function (e.g. axpy, ger, scal, gemm, ...)
+où * est une fonction blas ou lapack  (e.g. axpy, ger, scal, gemm, ...)
+(dans tst/ il n'y a que dgemm, dgetrf plus d'autre fonction utiles pour les mesures de performances)
 
 ## Environnement GUIX utilisé
 
+** Guix pas disponible pour le moment, vous devez utiliser la commande "module"  comme mentionner plus bas **
 Pour avoir le même environnement guix que pour les tests développer :
 ```sh
 guix environment --pure mkl git --ad-hoc less gcc-toolchain coreutils mkl emacs -- /bin/bash
@@ -54,22 +56,17 @@ make **nom de la fonction**-perf
 ```
 Puis
 
-### Ddot
-Ddot-perf prend 4 arguments en entrée
+### Dgemm
+Dgemm-perf  prend 4 arguments en entrée
 ```sh
-./tst/ddot-perf <start> <end> <step> <nsample>
+./tst/dgemm-perf <start> <end> <step> <nsample>
 ```
 * start   : taille de début
 * end     : taille maximale (pas atteinte si il n'y a pas de n tel que end=start*((1 + step/100)^n))
 * step    : augmentation de la taille du problème (en %). Ex : si step = 25, alors la les valeurs testées seront de la forme start*(1.25^n)
 * nsample : nombre d'échantillon à tester pour chaque taille de matrice traitée.
 
-### Dgemm
-Dgemm-perf  prend 4 arguments en entrée
-```sh
-./tst/dgemm-perf <start> <end> <step> <nsample>
-```
-Ces valeurs ont la même signification que pour ddot.
+### Dgemm tuilé
 
 ## Nettoyer le projet
 
