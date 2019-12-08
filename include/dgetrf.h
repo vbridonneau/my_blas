@@ -9,7 +9,7 @@ void my_dgetrf(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda );
 
 void my_dgetrf_omp(const CBLAS_LAYOUT Order, int m, int n, double* a, int lda );
 
-extern const int block_size;
+extern int block_size;
 
 void my_pdgetrf_scatter(int M, int N, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type);
 

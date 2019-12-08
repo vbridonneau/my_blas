@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
-const int block_size = 2;
+int block_size;
 
 void my_pdgetrf_scatter(int M, int N, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type) {
   /* MPI info */
