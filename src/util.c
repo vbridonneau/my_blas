@@ -17,7 +17,7 @@ double* tmp_alloc_matrix(int m, int n, double val) {
 void affiche(int m, int n, double *a, int lda, FILE* flux) {
   for (int l = 0; l < m; l++) {
     for (int c = 0; c < n; c++) {
-      fprintf(flux, "%lf ", a[l + c*lda]);
+      fprintf(flux, "%4.1lf ", a[l + c*lda]);
     }
     fputc('\n', flux);
   }

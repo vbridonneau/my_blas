@@ -3,7 +3,7 @@ MPICC=mpicc
 LIB_ALGO_NUM_PATH=/home/cisd-faverge/algonum/lib
 CFLAGS=-O0 -g --std=gnu11 -fopenmp -I./include/ -Wl,-rpath,$(LIB_ALGO_NUM_PATH)
 LDFLAGS=-lm -L$(LIB_ALGO_NUM_PATH) -lalgonum
-SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c dgetrf.c dtrsm.c dgemm_omp.c dgetrf-omp.c dgemm-tile.c
+SRC=util.c ddot.c dgemm.c daxpy.c dscal.c dgemv.c dger.c dgetrf.c dtrsm.c dgemm_omp.c dgetrf-omp.c dgemm-tile.c pdgetrf.c
 OBJ=$(patsubst %.c, %.o, $(SRC))
 TST=driver.c
 
@@ -19,6 +19,12 @@ test:lib/libmyblas.a driver.o
 #-DMKL_ILP64 -m64 -I${MKLROOT}/include
 %-perf.o:tst/%-perf.c
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
+
+p%-perf:p%-perf.o lib/libmyblas.a
+	${MPICC} ${CFLAGS} -o tst/$@ $< -L./lib/ -lmyblas ${LDFLAGS}
+
+p%-perf.o:tst/p%-perf.c
+	${MPICC} ${CFLAGS} -c $< ${LDFLAGS}
 
 run-%-test: %-test
 	./tst/$^
