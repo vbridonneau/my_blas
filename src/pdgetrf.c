@@ -28,6 +28,12 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, double* A, int lda ) {
   int last_band_size   = (N % block_size) * M;
   int is_last_complete = ((N % block_size) == 0);
 
+  /***********************************************/
+  /* FIXME : Create a data type for band to send */
+  /* by A and one to send by Asub.               */
+  /* Or think about array of array.              */
+  /***********************************************/
+
   /* Matrices */
   int NT_treated = (rank <= rlast) ? NT : NT - 1;
   int matrix_size;
@@ -48,7 +54,7 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, double* A, int lda ) {
 
   /* Split */
 
-  /* Begin with scattering complete band to all processes */
+  /* Begin by scattering complete band to all processes */
   for (int i = 0; i < NT - 1; ++i) {
     MPI_Scatter(A + i * size * block_size * lda, size, band_type, Asub + i * block_size * M, 1, band_type, 0, MPI_COMM_WORLD);
   }
@@ -91,6 +97,9 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, double* A, int lda ) {
   /* Computation */
 
   /* Gather data */
+  for (int i = 0; i < NT - 1; ++i) {
+    MPI_Gather(Asub + i * band_size, 1, band_type, A + i * size * band_size, size, band_type, 0, MPI_COMM_WORLD);
+  }
 
   free(Asub);
 
