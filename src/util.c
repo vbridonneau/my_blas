@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "util.h"
+
 
 double* tmp_alloc_matrix(int m, int n, double val) {
     double *res = malloc(m * n * sizeof(double));
@@ -15,7 +17,7 @@ double* tmp_alloc_matrix(int m, int n, double val) {
 void affiche(int m, int n, double *a, int lda, FILE* flux) {
   for (int l = 0; l < m; l++) {
     for (int c = 0; c < n; c++) {
-      fprintf(flux, "%lf ", a[l + c*lda]);
+      fprintf(flux, "%4.1lf ", a[l + c*lda]);
     }
     fputc('\n', flux);
   }
@@ -55,4 +57,12 @@ void rnd_matrix_buff(double *v, int bottom, int up, int size, int seed) {
 
 int eq_double(double a, double b, double eps) {
   return fabs(a - b) < eps;
+}
+
+int min(const int a, const int b) {
+  return (a < b) ? a : b;
+}
+
+int max(const int a, const int b) {
+    return (a > b) ? a : b;
 }
