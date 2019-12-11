@@ -21,10 +21,10 @@ test:lib/libmyblas.a driver.o
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}
 
 p%-perf:p%-perf.o lib/libmyblas.a
-	${MPICC} ${CFLAGS} -o tst/$@ $< -L./lib/ -lmyblas ${LDFLAGS}
+	${MPICC} ${CFLAGS} -o tst/$@ $< -L./lib/ -lmyblas ${LDFLAGS} -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
 
 p%-perf.o:tst/p%-perf.c
-	${MPICC} ${CFLAGS} -c $< ${LDFLAGS}
+	${MPICC} ${CFLAGS} -DMKL_ILP64 -m64 -I${MKLROOT}/include -c $< ${LDFLAGS}
 
 run-%-test: %-test
 	./tst/$^
