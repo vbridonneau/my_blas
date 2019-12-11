@@ -2,12 +2,13 @@
 #include "dgetrf.h"
 #include "algonum.h"
 #include "util.h"
+#include "dtrsm.h"
+#include "dgemm.h"
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
-int block_size;
-
-void my_pdgetrf_scatter(int M, int N, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type) {
+void my_pdgetrf_scatter(int M, int N, int block_size, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type) {
   /* MPI info */
   int rank, size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -18,9 +19,9 @@ void my_pdgetrf_scatter(int M, int N, double* A, int lda, double *Asub, MPI_Data
   int NT               = (Ndb + size - 1) / size;
   int rlast            = ((Ndb % size) + size - 1) % size;
   int is_last          = (rank == rlast);
-  int band_size        = block_size * M;
+  int band_size        = block_size * lda;
   int NT_treated       = (rank <= rlast) ? NT : NT - 1;
-  int last_band_size   = (N % block_size) * M;
+  int last_band_size   = (N % block_size) * lda;
   int is_last_complete = ((N % block_size) == 0);
 
   /* Types */
@@ -67,7 +68,7 @@ void my_pdgetrf_scatter(int M, int N, double* A, int lda, double *Asub, MPI_Data
   }
 }
 
-void my_pdgetrf_gather(int M, int N, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type) {
+void my_pdgetrf_gather(int M, int N, int block_size, double* A, int lda, double *Asub, MPI_Datatype *pband_type, MPI_Datatype *plast_band_type) {
   /* MPI info */
   int rank, size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -78,9 +79,9 @@ void my_pdgetrf_gather(int M, int N, double* A, int lda, double *Asub, MPI_Datat
   int NT               = (Ndb + size - 1) / size;
   int rlast            = ((Ndb % size) + size - 1) % size;
   int is_last          = (rank == rlast);
-  int band_size        = block_size * M;
+  int band_size        = block_size * lda;
   int NT_treated       = (rank <= rlast) ? NT : NT - 1;
-  int last_band_size   = (N % block_size) * M;
+  int last_band_size   = (N % block_size) * lda;
   int is_last_complete = ((N % block_size) == 0);
 
   /* Types */
@@ -125,26 +126,27 @@ void my_pdgetrf_gather(int M, int N, double* A, int lda, double *Asub, MPI_Datat
   }
 }
 
-void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, double* A, int lda ) {
+void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, int block_size, double* A, int lda ) {
   MPI_Datatype band_type, last_band_type;
-
-  /* Treat too small matrix size */
-  if (block_size >= min( M, N )) {
-    my_dgetf2( Order, M, N, A, lda );
-  }
 
   /* Get ranks */
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  /* Treat too small matrix size */
+  if (block_size >= min( M, N )) {
+    if(rank == 0)my_dgetf2( Order, M, N, A, lda );
+    return;
+  }
+
   /* Info for bandes per process */
   int Ndb              = (N + block_size - 1) / block_size;
   int NT               = (Ndb + size - 1) / size;
   int rlast            = ((Ndb % size) + size - 1) % size;
   int is_last          = (rank == rlast);
-  int band_size        = block_size * M;
-  int last_band_size   = (N % block_size) * M;
+  int band_size        = block_size * lda;
+  int last_band_size   = (N % block_size) * lda;
   int is_last_complete = ((N % block_size) == 0);
 
   /***********************************************/
@@ -173,14 +175,52 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, double* A, int lda ) {
   MPI_Type_commit( &last_band_type );
 
   /**************************** Split *********************/
-  my_pdgetrf_scatter(M, N, A, lda, Asub, &band_type, &last_band_type);
+  my_pdgetrf_scatter(M, N, block_size, A, lda, Asub, &band_type, &last_band_type);
 
   /********************** Computation ************************/
+  double *placeholder, *tmp_band = malloc(sizeof(double) * band_size);
+  int Nmax    = (is_last && !is_last_complete) ? 
+    (NT_treated - 1) * block_size + (N % block_size)
+    : NT_treated * block_size;
+  int maxiter = min( M, N );
+  int jb;
+  int jbb;
+  for(int j = 0, bandid = 0; j < maxiter; j += block_size, ++ bandid) {
+    jb  = min( min(M, N) - j, block_size );
+    jbb = min( min(M, Nmax) - j, block_size);
+
+    MPI_Datatype btype = (bandid == rlast && !is_last_complete) ?
+      last_band_type : band_type;
+    /* Root perform dgetrf */
+    if( rank == (bandid % size) ) {
+      int local_col_shift = (bandid / size) * band_size;
+      placeholder = Asub + j + local_col_shift;
+      my_dgetf2( Order, M - j, Nmax - jbb, placeholder, lda );
+    } else {
+      placeholder = tmp_band;
+    }
+    MPI_Bcast( placeholder, 1, btype, (bandid % size), MPI_COMM_WORLD );
+    MPI_Barrier(MPI_COMM_WORLD);
+    /* Perform a lot of dtrsm and dgemm instead of 1 */
+    for(int b = (bandid / size); b < NT_treated; ++b) {
+      /* Pointer for B in dtrsm arg's name */
+      double *Aptr = Asub + b * band_size;
+      int jj  = b * block_size;
+      int jbb = min ( min(M, Nmax) - jj, block_size );
+      if (jj + jbb < Nmax) {
+        my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, Nmax - jj - jbb, 1., placeholder + j, lda, Aptr + j + jbb*lda, lda );
+        if (j + jb < M) {
+          my_dgemm( Order, CblasNoTrans, CblasNoTrans, M - j - jb, jbb, jb, -1., placeholder + j + jb, lda, Aptr + j, lda, 1., Aptr + j + jb, lda );
+        }
+      }
+    }
+  }
 
   /********************** Gather data ************************/
-  my_pdgetrf_gather(M, N, A, lda, Asub, &band_type, &last_band_type);
+  my_pdgetrf_gather(M, N, block_size, A, lda, Asub, &band_type, &last_band_type);
 
   /*********************** Free Section ***********************/
+  free(tmp_band);
   free(Asub);
 
   /* Free types*/
