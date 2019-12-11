@@ -8,7 +8,7 @@
 #include "unistd.h"
 #include <stdbool.h>
 
-double epsilon = 0.0001;
+double epsilon = 1e-16;
 int max_width = 500;
 int max_height = 500;
 int max_element = 1000;
@@ -30,11 +30,6 @@ void fill_random_matrix(int m, int n, double * a, int lda) {
         }
      }
 }
-
-inline void zero_matrix(int m, int n, double * mat) {
-    memset(mat, m*n*sizeof(double), 0);
-}
-
 
 bool l1_dist(int m, int n, double * a, int lda, double * b, int ldb) {
     int i, j;
@@ -73,21 +68,20 @@ void test_dgemm(dgemm_fct_t dgemm) {
                 dgemm_ref(CblasColMajor, trans[ta], trans[tb], m[i], n[i], m[i], 1., a, n[i], b, m[i], 0.0, c_expected, n[i]);
                 dgemm(CblasColMajor, trans[ta], trans[tb], m[i], n[i], m[i], 1., a, n[i], b, m[i], 0.0, c_actual, n[i]);
             
-                VERBOSE(
-                    bool passed = l1_dist(m[i], n[i], c_actual, m[i], c_expected, m[i]) < epsilon;
-                    total++;
-                    if (passed) {
-                        printf("\033[1;32mPASS\033[0m");
-                    }
-                    else {
-                        failed++;
-                        printf("\033[1;31mFAIL\033[0m");
-                    }
-                    printf(" matrix %dx%d %s%s\n", m[i], n[i], trans_text[ta], trans_text[tb]);
-                )
-            }
-        }
-    }
+ 
+                bool passed = l1_dist(m[i], n[i], c_actual, m[i], c_expected, m[i]) < epsilon;
+                total++;
+                if (passed) {
+                    VERBOSE(printf("\033[1;32mPASS\033[0m");)
+                }
+                else {
+                    failed++;
+                    VERBOSE(printf("\033[1;31mFAIL\033[0m");)
+                }
+                VERBOSE(printf(" matrix %dx%d %s%s\n", m[i], n[i], trans_text[ta], trans_text[tb]);)
+             }
+         }
+     }
 
     free(a);
     free(b);
@@ -97,13 +91,13 @@ void test_dgemm(dgemm_fct_t dgemm) {
 
 int main(int argc, char * argv[]) {
     int opt;
-    while((opt = getopt(argc, argv, "uqe:")) != -1) {
+    while((opt = getopt(argc, argv, "hqe:")) != -1) {
         switch (opt) {
             case 'q':
                 verbose = false;
                 break;
-            case 'u':
-                printf("Usage: %s -eq", argv[0]);
+            case 'h':
+                printf("Usage: %s -eqh", argv[0]);
                 return EXIT_SUCCESS;
             case 'e':
                 epsilon=atof(optarg);
@@ -117,16 +111,17 @@ int main(int argc, char * argv[]) {
 
     srand(seed);
 
-    printf("---- my_dgemm_scalaire\n");
+    VERBOSE(printf("---- my_dgemm_scalaire\n");)
     test_dgemm(my_dgemm_scalaire);
-    printf("---- my_dgemm\n");
+    VERBOSE(printf("---- my_dgemm\n");)
     test_dgemm(my_dgemm);
 
+    VERBOSE(printf("\n");)
     if (failed) {
-        printf("\n\033[0;31m%d of %d tests failed\033[0m\n", failed, total);
+        printf("\033[1;31m%d of %d tests failed\033[0m\n", failed, total);
     }
     else {
-        printf("\n\033[0;32mall tests passed successfully\033[0m\n");
+        printf("\033[1;32mall tests passed successfully\033[0m\n");
     }
 
     return EXIT_SUCCESS;
