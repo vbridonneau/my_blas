@@ -194,40 +194,22 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, int block_size, double* 
     /* Root perform dgetrf */
     if( rank == (bandid % size) ) {
       int local_col_shift = (bandid / size) * band_size;
-      placeholder = Asub + j + local_col_shift;
-      if (rank == 0 && bandid <= 2) {
-        printf("A %d\n", rank);
-        affiche(M, block_size, placeholder, lda, stdout);
-        printf("local_col_shift %d -- %d\n", jbb, local_col_shift);
-      }
-      my_dgetf2( Order, M - j, jbb, placeholder, lda );
-      if (rank == 0 && bandid <= 2) {
-        printf("LU %d\n", rank);
-        affiche(M, jbb, placeholder, lda, stdout);
-      }
+      placeholder = Asub + local_col_shift;
+      my_dgetf2( Order, M - j, jbb, placeholder + j, lda );
     } else {
       placeholder = tmp_band;
     }
     if (bandid != Ndb-1) {
       MPI_Bcast( placeholder, 1, btype, (bandid % size), MPI_COMM_WORLD );
-      // for (int rnk = 0; rnk < size && bandid == 0; rnk++)
-      // {
-      //   if (rank == rnk) {
-      //     printf("%d\n", rank);
-      //     affiche(M, jbb, placeholder, lda, stdout);
-      //   }
-      //   MPI_Barrier(MPI_COMM_WORLD); 
-      // }
       /* Perform a lot of dtrsm and dgemm instead of 1 */
-      if(bandid <= 1)for(int b = (bandid / size) + (bandid % size >= rank); b < NT_treated; ++b) {
+      for(int b = (bandid / size) + (bandid % size >= rank); b < NT_treated; ++b) {
         /* Pointer for B in dtrsm arg's name */
         double *Aptr = Asub + b * band_size;
         int jj  = b * block_size;
         int sub_blocksize = (b == NT_treated - 1 && is_last && !is_last_complete) ? (N % block_size) : block_size;//min ( min(M, N) - jj, block_size );
-        printf("rank %d -- %d -- %d -- %d\n", rank, jj, sub_blocksize, Nmax);
         if (jj + sub_blocksize <= Nmax) {
           my_dtrsm( Order, CblasLeft, CblasLower, CblasNoTrans, CblasUnit, jb, sub_blocksize, 1., placeholder + j, lda, Aptr + j, lda );
-          if(bandid == 0)if (j + jb < M) {
+          if (j + jb < M) {
             my_dgemm( Order, CblasNoTrans, CblasNoTrans, M - j - jb, sub_blocksize, jbb, -1., placeholder + j + jb, lda, Aptr + j, lda, 1., Aptr + j + jb, lda );
           }
         }
