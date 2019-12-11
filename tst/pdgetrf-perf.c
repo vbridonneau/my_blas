@@ -7,8 +7,8 @@
 
 void check_pdgetrf_split() {
   for (int Mb = 1; Mb < 10; ++Mb) {
-    for (int M = 10; M < 100; M += 5) {
-      for(int N = 10; N < 100; N += 5) {
+    for (int M = 9; M < 100; M += 5) {
+      for(int N = 9; N < 100; N += 5) {
 	double *A = alloc_matrix(M, N);
 	rnd_matrix_buff(A, 1, 10, M * N, 1);
 
@@ -107,7 +107,7 @@ void check_pdgetrf_split() {
 }
 
 void check_pdgetrf() {
-  int M = 9, N = 9;
+  int M = 11, N = 11;
   double *A = alloc_matrix(M, N);
 	double *my_LU = alloc_matrix(M, N);
 	double *lapack_LU = alloc_matrix(M, N);
@@ -118,13 +118,14 @@ void check_pdgetrf() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	if (rank == 0) {
-	  int iseed [] = {1, 52, 493, 31};
+	  //int iseed [] = {1, 52, 493, 31};
 
-	  LAPACKE_dlarnv(1, iseed, M * N, A);
+	  //LAPACKE_dlarnv(1, iseed, M * N, A);
+		rnd_matrix_buff(A, 1, 10, M*N, 1);
 
 		for (int i = 0; i < M; ++i)
 		{
-			A[i + i *M] *= 10;
+			A[i + i *M] += 50;
 		}
 
 		// printf("A %d %d\n", M, N);
@@ -135,58 +136,43 @@ void check_pdgetrf() {
 		memcpy(A2, A, sizeof(double) * M * N);
 
 		int *ipiv = malloc(sizeof(int) * N);
-		LAPACKE_dgetrf(CblasColMajor, M, N, lapack_LU, M, ipiv);
+		//LAPACKE_dgetrf(CblasColMajor, M, N, lapack_LU, M, ipiv);
 		// printf("LU %d %d\n", M, N);
 		// affiche(M, N, A, M, stdout);
 	}
 
 	if(rank == 0) {
 		printf("LU(Lapack) - A  %d %d\n", M, N);
-		cblas_daxpy(M * N, -1., lapack_LU, 1, A2, 1);
-		affiche(M, N, A2, M, stdout);
-
-		free(lapack_LU);
-		free(A2);
+		//cblas_daxpy(M * N, -1., lapack_LU, 1, A2, 1);
+		//affiche(M, N, A2, M, stdout);
+	
+		//free(lapack_LU);
+		//free(A2);
 	}
 
 
-		//free(ipiv);
-	my_pdgetrf(CblasColMajor, M, N, 2, my_LU, M);
+	MPI_Barrier(MPI_COMM_WORLD);
+	//free(ipiv);
+	//my_pdgetrf(CblasColMajor, M, N, 2, my_LU, M);
 	// if(rank == 0)
 	// {
 	// 	printf("L'U' %d %d\n", M, N);
 	// 	affiche(M, N, Acpy, M, stdout);
 	// }
+	my_pdgetrf(CblasColMajor, M, N, 2, my_LU, M);
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	if(rank == 0) {
-		printf("LU(my) - A  %d %d\n", M, N);
-		cblas_daxpy(M * N, -1., my_LU, 1, A, 1);
+		printf("LU(my mpi)  %d %d\n", M, N);
+		//cblas_daxpy(M * N, -1., my_LU, 1, A, 1);
+		affiche(M, N, my_LU, M, stdout);
+		my_dgetrf(CblasColMajor, M, N, A, M);
+		printf("LU(my seq)  %d %d\n", M, N);
 		affiche(M, N, A, M, stdout);
 
-		free(my_LU);
-		free(A);
+		//free(my_LU);
+		//free(A);
 	}
-
-	/* Check that 0 and 1 has the same matrix */
-	/* double *A1;
-	if(rank == 0) {
-	  A1 = alloc_matrix(M, N);
-	  MPI_Recv(A1, M*N, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-	  for (int elt = 0; elt < M*N; ++elt) {
-	    if(!eq_double(A1[elt], A[elt], 1e-16)) {
-	      fprintf(stderr, "[0] : Bad gather for %dx%d matrix with %d block size\n",
-		      M, N, 2);
-					fflush(stderr);
-	      break;
-	    }  
-	  }
-    
-	  free(A1);
-	} else if (rank == 1) {
-	  MPI_Send(A, M * N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-	} */
-
 }
 
 int main(int argc, char **argv) {
