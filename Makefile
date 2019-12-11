@@ -22,6 +22,8 @@ test:lib/libmyblas.a driver.o
 run-%-test: %-test
 	./tst/$^
 
+tests: run-dgemm-test
+
 %-test:lib/libmyblas.a %-test.o
 	${CC} ${CFLAGS} -o tst/$@ $@.o -Llib -lmyblas ${LDFLAGS}
 
