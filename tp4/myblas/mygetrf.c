@@ -25,10 +25,16 @@ my_dgetrf_openmp( CBLAS_LAYOUT layout, int M, int N, double *A, int lda )
 void my_dgetrf_tiled_openmp( CBLAS_LAYOUT layout,
                              int M, int N, int b, double **A )
 {
+    int m, n, k;
+    int K = ( M > N ) ? N : M;
+    int MT = my_iceil( M, b );
+    int NT = my_iceil( N, b );
+    int KT = my_iceil( K, b );
+
     for( k=0; k<KT; k++) {
         int kk = k == (KT-1) ? M - k * b : b;
 
-        my_dgetrf( CblasColMajor, kk, kk, A[ MT * k + k ], b );
+        my_dgetrf_seq( CblasColMajor, kk, kk, A[ MT * k + k ], b );
 
         for( n=k+1; n<NT; n++) {
             int nn = n == (NT-1) ? N - n * b : b;

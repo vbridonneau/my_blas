@@ -83,6 +83,6 @@ insert_dgetrf( int                  m,
     starpu_insert_task(
         starpu_mpi_codelet(&cl_dgetrf),
         STARPU_VALUE, &args, sizeof(cl_dgetrf_arg_t),
-        /* TODO */,    A,
+        STARPU_RW,    A,
         0);
 }

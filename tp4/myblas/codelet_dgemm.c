@@ -145,8 +145,8 @@ insert_dgemm( CBLAS_TRANSPOSE      transA,
     starpu_insert_task(
         starpu_mpi_codelet(&cl_dgemm),
         STARPU_VALUE, &args, sizeof(cl_dgemm_arg_t),
-        /* TODO */,    A,
-        /* TODO */,    B,
-        /* TODO */,    C,
+        STARPU_R,    A,
+        STARPU_R,    B,
+        STARPU_RW,    C,
         0);
 }
