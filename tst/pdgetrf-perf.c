@@ -159,8 +159,8 @@ void check_pdgetrf() {
 				// printf("myLU seq\n");
 				// affiche(M, N, A, M, stdout);
 				}
-				//free(my_LU);
-				//free(A)
+				free(my_LU);
+				free(A);
 				MPI_Barrier(MPI_COMM_WORLD);
 			}
 		}	

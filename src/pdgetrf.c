@@ -222,8 +222,8 @@ void my_pdgetrf(const CBLAS_LAYOUT Order, int M, int N, int block_size, double* 
   my_pdgetrf_gather(M, N, block_size, A, lda, Asub, &band_type, &last_band_type);
 
   /*********************** Free Section ***********************/
-  //free(tmp_band);
-  //free(Asub);
+  free(tmp_band);
+  free(Asub);
 
   /* Free types*/
   MPI_Type_free( &band_type );
