@@ -24,19 +24,19 @@ int failed = 0;
 
 void fill_random_matrix(int m, int n, double * a, int lda) {
     int i, j;
-    for(i=0;i<n;i++) {
+    for(i=0;i<m;i++) {
         for(j=0;j<n;j++) {
             a[i+j*lda] = (rand() % (max_element+1)) * (1-(rand()%2)*2);
         }
      }
 }
 
-bool l1_dist(int m, int n, double * a, int lda, double * b, int ldb) {
+double l1_dist(int m, int n, double * a, int lda, double * b, int ldb) {
     int i, j;
     double norm = 0.0;
-    for(i=0;i<n;i++) {
+    for(i=0;i<m;i++) {
         for(j=0;j<n;j++) {
-            norm += abs(a[i+j*lda] - b[i+j*ldb]);
+            norm += fabs(a[i+j*lda] - b[i+j*ldb]);
         }
     }
     return norm;
@@ -63,13 +63,13 @@ void test_dgemm(dgemm_fct_t dgemm) {
     for(ta=0;ta<2;ta++) {
         for(tb=0;tb<2;tb++) {
             for(i=0;i<3;i++) {
-                fill_random_matrix(n[i], m[i], a, n[i]);
-                fill_random_matrix(m[i], n[i], b, m[i]);
-                dgemm_ref(CblasColMajor, trans[ta], trans[tb], m[i], n[i], m[i], 1., a, n[i], b, m[i], 0.0, c_expected, n[i]);
-                dgemm(CblasColMajor, trans[ta], trans[tb], m[i], n[i], m[i], 1., a, n[i], b, m[i], 0.0, c_actual, n[i]);
+                fill_random_matrix(m[i], n[i], a, m[i]);
+                fill_random_matrix(n[i], m[i], b, n[i]);
+                dgemm_ref(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], 1., a, m[i], b, n[i], 0.0, c_expected, m[i]);
+                dgemm(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], 1., a, m[i], b, n[i], 0.0, c_actual, m[i]);
             
  
-                bool passed = l1_dist(m[i], n[i], c_actual, m[i], c_expected, m[i]) < epsilon;
+                bool passed = l1_dist(m[i], m[i], c_actual, m[i], c_expected, m[i]) < epsilon;
                 total++;
                 if (passed) {
                     VERBOSE(printf("\033[1;32mPASS\033[0m");)
