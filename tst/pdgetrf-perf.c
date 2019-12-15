@@ -167,9 +167,43 @@ void check_pdgetrf() {
 	}
 }
 
+
+void test_pdgetrf_perf(int start, int end, int step, int nsample) {
+  int size;
+  struct timeval startt, endt, deltat_my, deltat_mkl;
+  printf("size, block_size, perf\n");
+
+  for (size = start; size < end; size = (size*(100 + step))/100) {
+    double *my_LU = alloc_matrix(size, size);
+
+    for (int block_size = 1; block_size < 11; ++block_size) {
+
+        for (int sample = 0; sample < nsample; ++sample) {
+            double _size   = (double)size;
+            
+            gettimeofday(&startt, NULL);
+            my_pdgetrf(CblasColMajor, size, size, block_size, my_LU, size);
+            gettimeofday(&endt, NULL);
+            timersub(&endt, &startt, &deltat_my);
+
+            double mytime  = (double)(1000000*deltat_my.tv_sec + deltat_my.tv_usec)*1e-6;
+            printf("%d, %d, %lf\n", size, block_size, flops_dgetrf(_size, _size)/mytime);
+        
+        }
+    }
+    free(my_LU);
+  }
+}
+
+
 int main(int argc, char **argv) {
-  MPI_Init(&argc, &argv);
-  check_pdgetrf();
-  MPI_Finalize();
+	MPI_Init(&argc, &argv);
+	int start, end, step, nsample;
+	start   = 50;
+	end     = 3000;
+	step    = 50; // en poucentage
+	nsample = 5;
+	test_pdgetrf_perf(start, end, step, nsample);
+  	MPI_Finalize();
   return EXIT_SUCCESS;
 }
