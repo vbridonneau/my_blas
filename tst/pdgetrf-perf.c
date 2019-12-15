@@ -107,71 +107,63 @@ void check_pdgetrf_split() {
 }
 
 void check_pdgetrf() {
-  int M = 11, N = 11;
-  double *A = alloc_matrix(M, N);
-	double *my_LU = alloc_matrix(M, N);
-	double *lapack_LU = alloc_matrix(M, N);
-	double *A2 = alloc_matrix(M, N);
-
-  
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	if (rank == 0) {
-	  //int iseed [] = {1, 52, 493, 31};
-
-	  //LAPACKE_dlarnv(1, iseed, M * N, A);
-		rnd_matrix_buff(A, 1, 10, M*N, 1);
-
-		for (int i = 0; i < M; ++i)
+	for (int Mb = 1; Mb < 10; ++Mb)
+	{
+		for (int M = 10; M < 100; M += 10)
 		{
-			A[i + i *M] += 50;
-		}
+			for (int N = 10; N < 100; N += 10)
+			{
+				double *A = alloc_matrix(M, N);
+				double *my_LU = alloc_matrix(M, N);
 
-		// printf("A %d %d\n", M, N);
-		// affiche(M, N, A, M, stdout);
+				int rank;
+				MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-		memcpy(my_LU , A, sizeof(double) * M * N);
-		memcpy(lapack_LU, A, sizeof(double) * M * N);
-		memcpy(A2, A, sizeof(double) * M * N);
+				if (rank == 0) {
+					rnd_matrix_buff(A, 1, 10, M*N, 1);
 
-		int *ipiv = malloc(sizeof(int) * N);
-		//LAPACKE_dgetrf(CblasColMajor, M, N, lapack_LU, M, ipiv);
-		// printf("LU %d %d\n", M, N);
-		// affiche(M, N, A, M, stdout);
-	}
+					int maxiter = min(M, N);
+					for (int i = 0; i < maxiter; ++i)
+					{
+						A[i + i *maxiter] += 50;
+					}
 
-	if(rank == 0) {
-		printf("LU(Lapack) - A  %d %d\n", M, N);
-		//cblas_daxpy(M * N, -1., lapack_LU, 1, A2, 1);
-		//affiche(M, N, A2, M, stdout);
-	
-		//free(lapack_LU);
-		//free(A2);
-	}
+					memcpy(my_LU , A, sizeof(double) * M * N);
+				}
 
 
-	MPI_Barrier(MPI_COMM_WORLD);
-	//free(ipiv);
-	//my_pdgetrf(CblasColMajor, M, N, 2, my_LU, M);
-	// if(rank == 0)
-	// {
-	// 	printf("L'U' %d %d\n", M, N);
-	// 	affiche(M, N, Acpy, M, stdout);
-	// }
-	my_pdgetrf(CblasColMajor, M, N, 2, my_LU, M);
-	MPI_Barrier(MPI_COMM_WORLD);
+				MPI_Barrier(MPI_COMM_WORLD);
+				my_pdgetrf(CblasColMajor, M, N, Mb, my_LU, M);
+				MPI_Barrier(MPI_COMM_WORLD);
 
-	if(rank == 0) {
-		printf("LU(my mpi)  %d %d\n", M, N);
-		//cblas_daxpy(M * N, -1., my_LU, 1, A, 1);
-		affiche(M, N, my_LU, M, stdout);
-		my_dgetrf(CblasColMajor, M, N, A, M);
-		printf("LU(my seq)  %d %d\n", M, N);
-		affiche(M, N, A, M, stdout);
-
-		//free(my_LU);
-		//free(A);
+				if(rank == 0) {
+					my_dgetrf(CblasColMajor, M, N, A, M);
+					int is_ok = 1;
+					for (int j = 0; j < N; ++j) {
+						for (int i = 0; i < M; ++i) {
+							if (!eq_double(my_LU[j*M + i], A[j*M + i], 1e-16)) {
+								fprintf(stderr, "%d,%d : A : %lf -- LU : %lf\n",
+									i, j, A[j*M + i], my_LU[j*M + i]);
+								is_ok = 0;
+								break;
+							}
+						}
+						if(!is_ok) {
+							fprintf(stderr, "Bad result for %dx%d matrix with %d block size\n",
+								M, N, Mb);
+							break;
+						}
+					}
+				// printf("myLU mpi\n");
+				// affiche(M, N, my_LU, M, stdout);
+				// printf("myLU seq\n");
+				// affiche(M, N, A, M, stdout);
+				}
+				free(my_LU);
+				free(A);
+				MPI_Barrier(MPI_COMM_WORLD);
+			}
+		}	
 	}
 }
 
