@@ -199,9 +199,9 @@ void test_pdgetrf_perf(int start, int end, int step, int nsample) {
 int main(int argc, char **argv) {
 	MPI_Init(&argc, &argv);
 	int start, end, step, nsample;
-	start   = 50;
-	end     = 3000;
-	step    = 50; // en poucentage
+	start   = 1600;
+	end     = 3400;
+	step    = 100; // en poucentage
 	nsample = 5;
 	test_pdgetrf_perf(start, end, step, nsample);
   	MPI_Finalize();
