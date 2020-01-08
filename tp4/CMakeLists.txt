@@ -9,6 +9,8 @@
 ###
 cmake_minimum_required (VERSION 2.8)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
+
 include_directories( ${CMAKE_SOURCE_DIR}/algonum/include )
 
 option( ENABLE_STARPU "Define if StarPU support is enabled or not" OFF )

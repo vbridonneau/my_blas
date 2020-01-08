@@ -11,7 +11,7 @@
 dgemm_fct_t dgemm_seq = my_dgemm_seq;
 dgemm_fct_t dgemm_omp = NULL;
 
-#define GETOPT_STRING "hv:M:N:K:AB"
+#define GETOPT_STRING "hv:M:N:K:ABb:"
 static struct option long_options[] =
 {
     {"help",          no_argument,       0,      'h'},

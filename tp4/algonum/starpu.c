@@ -95,7 +95,7 @@ get_starpu_handle( int id, starpu_data_handle_t *handles, double **A, int m, int
          */
         {
             /* TODO */
-            int64_t tag = ((int_64_t)id << 32) | ( n * MT + m );
+            int64_t tag = ((int64_t)id << 32) | ( n * MT + m );
             starpu_mpi_data_register( *tile_handle, tag, owner );
         }
 #endif /* defined(CHAMELEON_USE_MPI) */
@@ -133,7 +133,7 @@ get_starpu_handle_lap( int id, starpu_data_handle_t *handle,
          * Be careful to take into account the multiple decriptors that can be used in parallel.
          */
         {
-            int64_t tag = ((int_64_t)id << 32) | ( j * MT + i );
+            int64_t tag = ((int64_t)id << 32) | ( j * MT + i );
             starpu_mpi_data_register( *handle, tag, owner );
         }
 #endif /* defined(CHAMELEON_USE_MPI) */

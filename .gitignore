@@ -6,3 +6,4 @@ tst/*-perf
 !tst/*-perf.c
 tst/*-test
 !tst/*-test.c
+/tp4/build

@@ -1,22 +1,35 @@
 #include "algonum.h"
-#include "codelets.h"
 
 void
-my_dgetrf_tiled_starpu( CBLAS_LAYOUT layout,
-                        int M, int N, int b, double **A )
+my_dgetrf_seq( CBLAS_LAYOUT layout, int M, int N, double *A, int lda )
 {
-    starpu_data_handle_t *handlesA;
-    starpu_data_handle_t hAkk, hAkn, hAmk, hAmn;
+    int m, n, k;
+    int K = ( M > N ) ? N : M;
 
-    /* Let's compute the total number of tiles with a *ceil* */
+    for( k=0; k<K; k++ ) {
+        for( m=k+1; m<M; m++ ) {
+            A[ lda * k + m ] = A[ lda * k + m ] / A[ lda * k + k ];
+            for( n=k+1; n<N; n++ ) {
+                A[ lda * n + m ] = A[ lda * n + m ] - A[ lda * k + m ] * A[ lda * n + k ];
+            }
+        }
+    }
+}
+
+void
+my_dgetrf_openmp( CBLAS_LAYOUT layout, int M, int N, double *A, int lda )
+{
+    my_dgetrf_seq( layout, M, N, A, lda );
+}
+
+void my_dgetrf_tiled_openmp( CBLAS_LAYOUT layout,
+                             int M, int N, int b, double **A )
+{
+    int m, n, k;
+    int K = ( M > N ) ? N : M;
     int MT = my_iceil( M, b );
     int NT = my_iceil( N, b );
-    int KT = my_imin( MT, NT );
-    int m, n, k;
-
-    handlesA = calloc( MT * NT, sizeof(starpu_data_handle_t) );
-    
-    int K = ( M > N ) ? N : M;
+    int KT = my_iceil( K, b );
 
     for( k=0; k<KT; k++) {
         int kk = k == (KT-1) ? M - k * b : b;
@@ -50,14 +63,7 @@ my_dgetrf_tiled_starpu( CBLAS_LAYOUT layout,
             }
         }
     }
-   
-    unregister_starpu_handle( MT * NT, handlesA );
-
-    /* Let's wait for the end of all the tasks */
-    starpu_task_wait_for_all();
-#if defined(ENABLE_MPI)
-    starpu_mpi_barrier(MPI_COMM_WORLD);
-#endif
-
-    free( handlesA );
 }
+
+/* To make sure we use the right prototype */
+static dgetrf_fct_t valig_mygetrf __attribute__ ((unused)) = my_dgetrf_seq;

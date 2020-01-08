@@ -7,6 +7,7 @@
 #include "algonum.h"
 #include "unistd.h"
 #include <stdbool.h>
+#include <cblas.h>
 
 double epsilon = 1e-16;
 int max_width = 500;
@@ -14,11 +15,11 @@ int max_height = 500;
 int max_element = 1000;
 int seed = 42;
 bool verbose = true;
-dgemm_fct_t dgemm_ref = my_dgemm_scalaire;
-
-
+dgemm_fct_t dgemm_ref = cblas_dgemm;
 int total = 0;
 int failed = 0;
+double one = 1.0;
+double zero = 0.0;
 
 #define VERBOSE(A) if(verbose) { A }
 
@@ -53,8 +54,7 @@ void test_dgemm(dgemm_fct_t dgemm) {
     int tb;
  
     CBLAS_TRANSPOSE trans[2] = {CblasTrans, CblasNoTrans};
-    char * trans_text[2] = {"T", "N"};
-  
+
     int m[3] = {max_width, rand()%max_height, rand()%max_height};
     int n[3] = {max_height, rand()%max_height, rand()%max_height}; 
     
@@ -65,10 +65,9 @@ void test_dgemm(dgemm_fct_t dgemm) {
             for(i=0;i<3;i++) {
                 fill_random_matrix(m[i], n[i], a, m[i]);
                 fill_random_matrix(n[i], m[i], b, n[i]);
-                dgemm_ref(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], 1., a, m[i], b, n[i], 0.0, c_expected, m[i]);
-                dgemm(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], 1., a, m[i], b, n[i], 0.0, c_actual, m[i]);
-            
- 
+                dgemm_ref(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], one, a, m[i], b, n[i], zero, c_expected, m[i]);
+                dgemm(CblasColMajor, trans[ta], trans[tb], m[i], m[i], n[i], one, a, m[i], b, n[i], zero, c_actual, m[i]);
+
                 bool passed = l1_dist(m[i], m[i], c_actual, m[i], c_expected, m[i]) < epsilon;
                 total++;
                 if (passed) {
@@ -78,7 +77,7 @@ void test_dgemm(dgemm_fct_t dgemm) {
                     failed++;
                     VERBOSE(printf("\033[1;31mFAIL\033[0m");)
                 }
-                VERBOSE(printf(" matrix %dx%d %s%s\n", m[i], n[i], trans_text[ta], trans_text[tb]);)
+                VERBOSE(printf(" matrix %dx%d %c%c\n", m[i], n[i], "TN"[ta],"TN"[tb]);)
              }
          }
      }
@@ -91,17 +90,30 @@ void test_dgemm(dgemm_fct_t dgemm) {
 
 int main(int argc, char * argv[]) {
     int opt;
-    while((opt = getopt(argc, argv, "hqe:")) != -1) {
+    while((opt = getopt(argc, argv, "huqe:s:m:n:")) != -1) {
         switch (opt) {
             case 'q':
                 verbose = false;
                 break;
+            case 'u':
             case 'h':
-                printf("Usage: %s -eqh", argv[0]);
+                printf("Usage: %s -huqesmn\n", argv[0]);
                 return EXIT_SUCCESS;
             case 'e':
-                epsilon=atof(optarg);
+                epsilon = atof(optarg);
                 printf("epsilon=%f\n", epsilon);
+                break;
+            case 's':
+                seed = atoi(optarg);
+                printf("seed=%d\n", seed);
+                break;
+            case 'm':
+                max_height = atoi(optarg);
+                printf("m=%d\n", max_height);
+                break;
+            case 'n':
+                max_width = atoi(optarg);
+                printf("n=%d\n", max_width);
                 break;
             default:
                 fprintf(stderr, "invalid option %c\n", opt);
@@ -111,9 +123,9 @@ int main(int argc, char * argv[]) {
 
     srand(seed);
 
-    VERBOSE(printf("---- my_dgemm_scalaire\n");)
+    VERBOSE(printf("\033[1m==== my_dgemm_scalaire\033[0m\n");)
     test_dgemm(my_dgemm_scalaire);
-    VERBOSE(printf("---- my_dgemm\n");)
+    VERBOSE(printf("\033[1m==== my_dgemm\033[0m\n");)
     test_dgemm(my_dgemm);
 
     VERBOSE(printf("\n");)

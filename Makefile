@@ -31,12 +31,12 @@ run-%-test: %-test
 
 tests: run-dgemm-test
 
-%-test:lib/libmyblas.a %-test.o
-	${CC} ${CFLAGS} -o tst/$@ $@.o -Llib -lmyblas ${LDFLAGS}
+%-test:%-test.o lib/libmyblas.a
+	${MPICC} ${CFLAGS} -o tst/$@ $< -L./lib/ -lmyblas ${LDFLAGS} -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
 
 #-DMKL_ILP64 -m64 -I${MKLROOT}/include
 %-test.o:tst/%-test.c
-	${CC} ${CFLAGS} -c $< ${LDFLAGS}
+	${CC} ${CFLAGS} -DMKL_ILP64 -m64 -I${MKLROOT}/include -c $< ${LDFLAGS}
 
 %.o:src/%.c
 	${CC} ${CFLAGS} -c $< ${LDFLAGS}

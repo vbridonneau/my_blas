@@ -133,7 +133,7 @@ insert_dtrsm( CBLAS_SIDE           side,
     starpu_insert_task(
         starpu_mpi_codelet(&cl_dtrsm),
         STARPU_VALUE, &args, sizeof(cl_dtrsm_arg_t),
-        /* TODO */,     A,
-        /* TODO */,     B,
+        STARPU_RW,     A,
+        STARPU_RW,     B,
         0);
 }

@@ -100,7 +100,7 @@ void unregister_starpu_handle( int nb, starpu_data_handle_t *handlesA );
 static inline double *
 tile_interface_get( void *interface )
 {
-    STARPU_MATRIX_CHECK( interface );
+    // STARPU_MATRIX_CHECK( interface );
     return (double *)(((struct starpu_matrix_interface *)(interface))->ptr);
 }
 

@@ -35,7 +35,7 @@ my_dgemm_tiled_starpu( CBLAS_LAYOUT layout,
             if ( transA == CblasNoTrans ) {
                 if ( transB == CblasNoTrans ) {
 
-                    /* A: CblasNoTrans / B: CblasNoTrans */
+                    // A: CblasNoTrans / B: CblasNoTrans
                     for( k=0; k<KT; k++) {
                         int kk = k == (KT-1) ? K - k * b : b;
                         double lbeta = (k == 0) ? beta : 1.;
@@ -49,7 +49,7 @@ my_dgemm_tiled_starpu( CBLAS_LAYOUT layout,
                 }
                 else {
 
-                    /* A: Cblas[Conj]Trans / B: CblasNoTrans */
+                    // A: Cblas[Conj]Trans / B: CblasNoTrans
                     for( k=0; k<KT; k++) {
                         int kk = k == (KT-1) ? K - k * b : b;
                         double lbeta = (k == 0) ? beta : 1.;
@@ -65,7 +65,7 @@ my_dgemm_tiled_starpu( CBLAS_LAYOUT layout,
             else {
                 if ( transB == CblasNoTrans ) {
 
-                    /* A: CblasNoTrans / B: Cblas[Conj]Trans */
+                    // A: CblasNoTrans / B: Cblas[Conj]Trans
                     for( k=0; k<KT; k++) {
                         int kk = k == (KT-1) ? K - k * b : b;
                         double lbeta = (k == 0) ? beta : 1.;
@@ -79,7 +79,7 @@ my_dgemm_tiled_starpu( CBLAS_LAYOUT layout,
                 }
                 else {
 
-                    /* A: Cblas[Conj]Trans / B: Cblas[Conj]Trans */
+                    // A: Cblas[Conj]Trans / B: Cblas[Conj]Trans
                     for( k=0; k<KT; k++) {
                         int kk = k == (KT-1) ? K - k * b : b;
                         double lbeta = (k == 0) ? beta : 1.;
